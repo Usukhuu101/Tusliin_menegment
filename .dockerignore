@@ -1,0 +1,10 @@
+.env
+storage/
+evaluation/results/
+**/__pycache__/
+.pytest_cache/
+.git/
+data/raw/
+data/cleaned/adr_records.csv
+docs/
+tests/

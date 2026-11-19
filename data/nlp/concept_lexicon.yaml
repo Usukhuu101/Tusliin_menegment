@@ -1,0 +1,508 @@
+# =============================================================================
+# Mongolian health CONCEPT LEXICON  (data, not code — reviewed & versioned)
+# -----------------------------------------------------------------------------
+# One concept id <- many ways of writing it.
+#   mn:    Cyrillic patterns. Each word is a STEM (prefix): "өвд" matches
+#          өвдөх / өвдөөд / өвдсөн / өвдөлт. Words must appear in order,
+#          within 4 words of each other.  "эм$" = exact word only.
+#   latin: Latin chat-script patterns (transliterated automatically).
+#   en:    English words/phrases (whole-word match).
+# type: symptom | red_flag | modifier | context | condition | exposure | medication
+# How to add a synonym: add a line, run `python -m pytest tests/test_normalizer.py`,
+# then `python evaluation/run_eval.py` and check nothing regressed.
+# Seeded partly from symptom wording in the MMRA adverse-reaction reports.
+# =============================================================================
+version: "1.0"
+concepts:
+
+  # ----------------------------------------------------------------- symptoms
+  headache:
+    label_mn: толгой өвдөх
+    type: symptom
+    mn: ["толгой өвд", "толгой хагар", "толгой лугши", "толгой хүндэр", "дух өвд", "шанх өвд", "мигрень"]
+    latin: ["tolgoi ovd", "tolgoi owd", "tolgoi uvd", "tolgoi owg", "tolgoi ovg", "tolgoi uwd"]
+    en: ["headache", "migraine", "head ache"]
+
+  fever:
+    label_mn: халуурах
+    type: symptom
+    mn: ["халуур", "халуунта", "халуун ихс", "халуун ихэс", "халуун өндөр", "биеийн халуун", "температур ихс", "температур өндөр", "бие халуу", "халуу орги"]
+    latin: ["haluur", "khaluur", "haluuntai", "khaluuntai"]
+    en: ["fever", "high temperature"]
+
+  cough:
+    label_mn: ханиалгах
+    type: symptom
+    mn: ["ханиал", "цэр гар", "хуурай ханиа"]
+    latin: ["hanial", "khanial", "haniald"]
+    en: ["cough", "coughing"]
+
+  sore_throat:
+    label_mn: хоолой өвдөх
+    type: symptom
+    mn: ["хоолой өвд", "хоолой хөндүүр", "хоолой загатн", "хоолой сөөн", "залгихад өвд", "гүйлсэн булчирхай"]
+    latin: ["hooloi ovd", "khooloi ovd", "hooloi owd"]
+    en: ["sore throat"]
+
+  runny_nose:
+    label_mn: нус гоожих, хамар битүүрэх
+    type: symptom
+    mn: ["нус гоож", "нус гар", "хамар битүү", "хамар бөглө", "найтаа"]
+    latin: ["nus gooj", "hamar bituu"]
+    en: ["runny nose", "stuffy nose", "sneezing"]
+
+  abdominal_pain:
+    label_mn: гэдэс, хэвлийгээр өвдөх
+    type: symptom
+    mn: ["гэдэс өвд", "хэвлий өвд", "ходоод өвд", "гэдэс базл", "хэвлий базл", "гэдэс мушгир", "хэвлий хатгу", "хэвлий хатга", "ходоод хорс", "ходоод исгэлэн"]
+    latin: ["gedes ovd", "gedes owd", "hevlii ovd", "khevlii ovd", "hodood ovd"]
+    en: ["stomach ache", "stomach pain", "abdominal pain", "belly pain"]
+
+  diarrhea:
+    label_mn: суулгах
+    type: symptom
+    mn: ["гүйлг", "суулг", "шингэн баас", "шингэн өтгөн", "өтгөн шингэн"]
+    latin: ["guilg", "suulg"]
+    en: ["diarrhea", "diarrhoea"]
+
+  nausea:
+    label_mn: дотор муухайрах
+    type: symptom
+    mn: ["дотор муухайр", "дотор муухай", "огиу", "дотор орги", "дотор эвгүй", "бөөлжис хүр"]
+    latin: ["dotor muuhair", "dotor muukhair", "ogiu"]
+    en: ["nausea", "nauseous", "feel sick"]
+
+  vomiting:
+    label_mn: бөөлжих
+    type: symptom
+    mn: ["бөөлж"]
+    latin: ["boolj", "buulj", "booljs"]
+    en: ["vomit", "vomiting", "throwing up"]
+
+  back_pain:
+    label_mn: нуруу өвдөх
+    type: symptom
+    mn: ["нуруу өвд", "бүсэлхий өвд", "нуруу хөндүүр", "нуруу хөш", "нуруу шархир"]
+    latin: ["nuruu ovd", "nuruu owd"]
+    en: ["back pain", "backache"]
+
+  rash:
+    label_mn: арьсны тууралт
+    type: symptom
+    mn: ["туур", "гүвдрүү", "арьс улай", "чонон хөрвөс", "улаан толбо", "арьсан дээр толбо"]
+    latin: ["tuuralt", "tuurch"]
+    en: ["rash", "hives", "urticaria"]
+
+  itching:
+    label_mn: загатнах
+    type: symptom
+    mn: ["загатн"]
+    latin: ["zagatn"]
+    en: ["itch", "itching", "itchy"]
+
+  dizziness:
+    label_mn: толгой эргэх
+    type: symptom
+    mn: ["толгой эргэ", "толгой манар", "нүд эрээлж", "толгой хөнгөр"]
+    latin: ["tolgoi erg"]
+    en: ["dizzy", "dizziness", "vertigo"]
+
+  fatigue:
+    label_mn: ядрах, сульдах
+    type: symptom
+    mn: ["ядар", "ядр", "сульд", "тамир муу", "тамиргүй", "сул дорой"]
+    latin: ["yadar", "suld"]
+    en: ["tired", "fatigue", "weakness"]
+
+  chest_pain:
+    label_mn: цээжээр өвдөх
+    type: symptom
+    mn: ["цээж өвд", "цээж базл", "цээж шах", "цээж дар", "цээж хатгу", "цээж хатга", "цээж хорс", "зүрх өвд", "зүрх хатгу", "зүрх хатга", "зүрх базл", "зүрх шах"]
+    latin: ["tseej ovd", "tseej owd", "ceej ovd", "ceej owd", "zurh ovd", "zurkh ovd"]
+    en: ["chest pain", "chest tightness"]
+
+  dyspnea:
+    label_mn: амьсгал давчдах
+    type: symptom
+    mn: ["амьсгал давчд", "амьсгаад", "амьсгал хүрэхгүй", "амьсгал бачуур", "амьсгал хэцүү", "амьсгалахад хэцүү", "бачуур", "амьсгал түгж"]
+    latin: ["amisgal davchd", "amisgal dawchd", "amisgaad", "amsgal davchd", "bachuur"]
+    en: ["shortness of breath", "short of breath", "difficulty breathing", "breathless"]
+
+  palpitations:
+    label_mn: зүрх дэлсэх
+    type: symptom
+    mn: ["зүрх дэлс", "зүрх түгш", "зүрх хүчтэй цохил", "зүрх хурдан цохил", "зүрх жигд бус"]
+    latin: ["zurh dels", "zurkh dels"]
+    en: ["palpitations", "racing heart"]
+
+  numbness:
+    label_mn: мэдээ алдах, бадайрах
+    type: symptom
+    mn: ["мэдээ алд", "мэдээгүй бол", "бадайр", "хөндүүрлэ"]
+    en: ["numbness", "tingling"]
+
+  burn:
+    label_mn: түлэгдэх
+    type: symptom
+    mn: ["түлэгд", "түлэнх", "буцалсан ус", "халуун ус асга", "халуун цай асга", "халуун сүү асга", "гал авалц"]
+    latin: ["tuleg", "tulegd"]
+    en: ["burn", "burned", "scald"]
+
+  frostbite:
+    label_mn: хөлдөх (хөлдөлт)
+    type: symptom
+    mn: ["хөлдө", "хөлдс", "хөлдж", "хөлдөлт"]
+    latin: ["holdo", "huruu hold"]
+    en: ["frostbite", "frozen fingers"]
+
+  hypothermia:
+    label_mn: хэт даарах
+    type: symptom
+    mn: ["хэт даар", "даараад чичр", "даарч хөр", "биеийн хэм буу", "хөрөөд чичр"]
+    en: ["hypothermia"]
+
+  stress:
+    label_mn: стресс, сэтгэл түгшил
+    type: symptom
+    mn: ["стресс", "сэтгэл түгш", "түгшүүр", "сэтгэл санаа унах", "сэтгэл санаа хямр", "сэтгэл гутр", "уйтгар гуниг", "гуниглаж", "айдас", "сандарч", "сэтгэл зов", "сэтгэл санаа тавгүй"]
+    latin: ["stress", "setgel tugsh", "tugshuur"]
+    en: ["stress", "anxiety", "anxious", "depression", "depressed"]
+
+  # ---------------------------------------------------- red-flag symptoms
+  severe_dyspnea:
+    label_mn: амьсгал боогдох / амьсгалж чадахгүй
+    type: red_flag
+    mn: ["амьсгал боогд", "амьсгал авч чадахгүй", "амьсгалж чадахгүй", "амьсгал авахгүй", "уруул хөхр", "уруул хөх бол", "нүүр хөхр", "хахаж байна"]
+    latin: ["amisgal boogd", "amisgalj chadahgui"]
+    en: ["can't breathe", "cannot breathe", "choking", "blue lips"]
+
+  radiating_pain:
+    label_mn: өвдөлт гар, эрүү, нуруу руу дамжих
+    type: red_flag
+    mn: ["зүүн гар өвд", "гар руу дамж", "гар луу дамж", "эрүү өвд", "эрүү рүү", "мөр рүү дамж", "нуруу руу дамж", "зүүн мөр"]
+    en: ["radiating to arm", "jaw pain", "left arm pain"]
+
+  cold_sweat:
+    label_mn: хүйтэн хөлс гарах
+    type: red_flag
+    mn: ["хүйтэн хөлс", "хөлс цутга", "хөлс бурж"]
+    en: ["cold sweat"]
+
+  face_droop:
+    label_mn: нүүр мурийх
+    type: red_flag
+    mn: ["нүүр мурий", "ам мурий", "нүүр унжи", "нүүрний нэг тал", "ам хазайс", "амны булан унж"]
+    latin: ["nuur muri"]
+    en: ["face drooping", "facial droop"]
+
+  slurred_speech:
+    label_mn: үг ээдрэх, ярьж чадахгүй болох
+    type: red_flag
+    mn: ["үг ээдр", "хэл ээдр", "яриа ээдр", "ярьж чадахгүй", "үг хэлж чадахгүй", "хэл орооцолд", "яриа ойлгомжгүй"]
+    latin: ["ug eedr", "hel eedr"]
+    en: ["slurred speech", "can't speak"]
+
+  one_side_weakness:
+    label_mn: гар хөл (нэг тал) сулрах
+    type: red_flag
+    mn: ["гар хөл сулр", "нэг тал сулр", "нэг талын гар", "нэг талын хөл", "гар хөл мэдээ алд", "гараа хөдөлгөж чадахгүй", "хөлөө хөдөлгөж чадахгүй", "гараа өргөж чадахгүй", "биеийн нэг тал"]
+    latin: ["gar hol sulr", "gar khol sulr"]
+    en: ["one side weakness", "arm weakness", "can't lift arm"]
+
+  vision_change:
+    label_mn: хараа муудах, бүрэлзэх
+    type: red_flag
+    mn: ["хараа мууд", "хараа бүрэлз", "нүд бүрэлз", "давхар харагд", "хараа алд", "харж чадахгүй", "нүд харанхуйл"]
+    latin: ["haraa muud", "kharaa muud"]
+    en: ["blurred vision", "double vision", "vision loss"]
+
+  stiff_neck:
+    label_mn: хүзүү хөших
+    type: red_flag
+    mn: ["хүзүү хөш", "хүзүү хөдөлгөж чадахгүй", "хүзүү чангар", "хүзүүгээ нугалж чадахгүй", "шил хөш"]
+    latin: ["huzuu hosh", "khuzuu khosh"]
+    en: ["stiff neck"]
+
+  unconscious:
+    label_mn: ухаан алдах
+    type: red_flag
+    mn: ["ухаан алд", "ухаангүй", "ухаан балар", "сэрэхгүй", "сэрээж чадахгүй", "ухаан орохгүй", "унаад босохгүй"]
+    latin: ["uhaan ald", "ukhaan ald", "uhaangui"]
+    en: ["unconscious", "fainted", "passed out", "unresponsive"]
+
+  seizure:
+    label_mn: таталт өгөх
+    type: red_flag
+    mn: ["таталт", "таталд", "татаж унаа", "уналт тус", "уналттай"]
+    latin: ["tatalt"]
+    en: ["seizure", "convulsion", "fit"]
+
+  confusion:
+    label_mn: ухаан самуурах
+    type: red_flag
+    mn: ["ухаан самуур", "дэмийр", "юм мэдэхгүй бол", "хаана байгаагаа мэдэхгүй", "хүнээ танихгүй"]
+    en: ["confused", "confusion", "disoriented"]
+
+  severe_bleeding:
+    label_mn: их хэмжээгээр цус алдах
+    type: red_flag
+    mn: ["цус зогсохгүй", "цус тогтохгүй", "их цус алд", "цус их гар", "цус шүршин", "цус гоож"]
+    latin: ["tsus zogsohgui"]
+    en: ["heavy bleeding", "bleeding won't stop"]
+
+  vomiting_blood:
+    label_mn: цус бөөлжих
+    type: red_flag
+    mn: ["цус бөөлж", "цустай бөөлж", "кофены шаар", "цус ханиа", "цустай цэр"]
+    en: ["vomiting blood", "coughing blood"]
+
+  blood_in_stool:
+    label_mn: өтгөнд цус гарах, хар өтгөн
+    type: red_flag
+    mn: ["хар өтгөн", "өтгөн хар", "цустай өтгөн", "цустай баас", "баас цустай", "өтгөн цустай", "цустай суулг", "баас хар"]
+    en: ["blood in stool", "black stool"]
+
+  throat_swelling:
+    label_mn: уруул, хэл, хоолой хавдах
+    type: red_flag
+    mn: ["хоолой хавд", "хэл хавд", "уруул хавд", "нүүр хавд", "хоолой бачуур", "залгиж чадахгүй", "хоолой битүүр"]
+    latin: ["hooloi havd", "uruul havd"]
+    en: ["throat swelling", "swollen lips", "swollen tongue"]
+
+  non_blanching_rash:
+    label_mn: дарахад арилахгүй тууралт
+    type: red_flag
+    mn: ["дарахад арилахгүй", "дарахад арилдаггүй", "дарахад алга болохгүй", "шилээр дарахад"]
+    en: ["rash doesn't fade", "non-blanching rash"]
+
+  jaundice:
+    label_mn: арьс, нүд шарлах
+    type: red_flag
+    mn: ["шарл", "нүд шар", "арьс шар", "нүдний цагаан шар"]
+    en: ["jaundice", "yellow skin", "yellow eyes"]
+
+  head_injury:
+    label_mn: толгойн гэмтэл
+    type: red_flag
+    mn: ["толгой цохиул", "толгой гэмт", "толгой мөргө", "унаж толгой", "толгойгоо цохи", "толгой хагар цус"]
+    en: ["head injury", "hit my head"]
+
+  swollen_lymph:
+    label_mn: тунгалгийн булчирхай хавдах
+    type: red_flag
+    mn: ["тунгалаг хавд", "тунгалгийн булчирхай", "булчирхай хавд", "суга хавд", "цавь хавд"]
+    en: ["swollen lymph"]
+
+  suicidal:
+    label_mn: амиа хорлох бодол
+    type: red_flag
+    ignore_negation: true
+    mn: ["амиа хорл", "амиа егүүт", "амиа бусд", "үхмээр", "үхэхийг хүс", "үхье гэж", "амьдармааргүй", "амьдрах хүсэлгүй", "амьдрах хүсэл алга", "амьдрах хүсэл байхгүй", "өөрийгөө гэмтээ", "өөрийгөө ала", "өөрийгөө хорл", "амьдрал утгагүй", "бүх юмыг дуусга"]
+    latin: ["amia horl", "amia khorl", "uhmeer", "ukhmeer", "amidarmaargui"]
+    en: ["suicide", "suicidal", "kill myself", "want to die", "end my life", "self harm"]
+
+  overdose_poison:
+    label_mn: эм хэтрүүлэх / хордлого
+    type: red_flag
+    mn: ["эм хэтрүүл", "тун хэтрүүл", "хэтрүүлэн уу", "их хэмжээний эм", "олон ширхэг эм", "бүх эмийг уу", "хор уус", "хор уучих", "хор залги", "цэвэрлэгээний бодис уу", "химийн бодис уу", "химийн бодис залги", "архинд хорд", "мөөгөнд хорд", "мөөг идээд"]
+    en: ["overdose", "swallowed poison", "poisoned"]
+
+  # --------------------------------------------------------- modifiers
+  severe_intensity:
+    label_mn: маш хүчтэй
+    type: modifier
+    mn: ["маш хүчтэй", "хэт хүчтэй", "хамгийн хүчтэй", "тэсэхийн аргагүй", "тэвчихийн аргагүй", "тэвчиж чадахгүй", "аймаар өвд", "аймшигтай өвд", "маш их өвд", "хүчтэй өвд", "ихэд өвд"]
+    latin: ["mash huchtei", "mash khuchtei", "teseh argagui"]
+    en: ["severe", "unbearable", "excruciating", "very bad"]
+
+  sudden_onset:
+    label_mn: гэнэт эхэлсэн
+    type: modifier
+    mn: ["гэнэт", "огцом", "гэнэтхэн"]
+    latin: ["genet"]
+    en: ["sudden", "suddenly"]
+
+  worst_ever:
+    label_mn: урьд өмнө байгаагүй хүчтэй
+    type: modifier
+    mn: ["амьдралдаа хамгийн", "урьд өмнө байгаагүй", "өмнө нь ийм байгаагүй", "хамгийн аймшигтай"]
+    en: ["worst headache", "worst pain of my life"]
+
+  # ----------------------------------------------------------- context
+  pregnancy:
+    label_mn: жирэмсэн
+    type: context
+    mn: ["жирэмс", "хүүхэд тээж", "гэдэс томтой"]
+    latin: ["jirems"]
+    en: ["pregnant", "pregnancy"]
+
+  infant:
+    label_mn: нярай, бага насны хүүхэд
+    type: context
+    mn: ["нярай", "сартай", "хөхүүл хүүхэд", "балчир", "хөхний хүүхэд", "мялаа"]
+    latin: ["nyarai", "sartai"]
+    en: ["baby", "infant", "newborn"]
+
+  child:
+    label_mn: хүүхэд
+    type: context
+    mn: ["хүүхэд", "хүүхд", "хүү маань", "охин маань", "бага насны"]
+    latin: ["huuhed", "khuukhed", "huuhd"]
+    en: ["child", "kid", "my son", "my daughter"]
+
+  elderly:
+    label_mn: өндөр настан
+    type: context
+    mn: ["өндөр настан", "өндөр настай", "ахмад настан", "өвөө маань", "эмээ маань"]
+    en: ["elderly"]
+
+  allergy_context:
+    label_mn: харшил / эм, тариа хэрэглэсний дараа
+    type: context
+    mn: ["харшил", "эм уусны дараа", "эм уугаад", "эмийг уусны дараа", "тариа хийлгэсний", "тариа хийлгээд", "тарилга хийлгэ", "зөгий хатгу", "зөгий хатга", "шавьж хатгу", "шавьж хатга", "хорхой хатга", "самар идээд"]
+    latin: ["harshil", "kharshil"]
+    en: ["allergy", "allergic", "bee sting"]
+
+  plague_risk:
+    label_mn: тарвага (тарваган тахлын эрсдэл)
+    type: exposure
+    mn: ["тарвага", "тарваг"]
+    latin: ["tarvaga", "tarwaga"]
+    en: ["marmot"]
+
+  co_exposure:
+    label_mn: угаартах (угаарын хий)
+    type: exposure
+    mn: ["угаар", "утаанд хорд", "утаанд хахаж", "яндан хаа"]
+    latin: ["ugaar", "ugaart"]
+    en: ["carbon monoxide"]
+
+  # stove / coal smoke indoors. ALONE = general information (air pollution);
+  # WITH headache / dizziness / nausea ... = possible CO poisoning (rule RF_CO_SMOKE_SYMPTOMS)
+  smoke_exposure:
+    label_mn: зуух, нүүрсний утаа
+    type: exposure
+    mn: ["зуух утаа", "зуухны утаа", "пийшин", "нүүрсний утаа", "гэрт утаа", "утаа орс", "утаа сав", "утаа гар"]
+    latin: ["zuuhnii utaa", "piishin"]
+
+  air_pollution:
+    label_mn: агаарын бохирдол (утаа)
+    type: condition
+    mn: ["агаарын бохирдол", "агаар бохир", "утаатай өдөр", "хотын утаа", "өвлийн утаа", "утаа", "смог"]
+    latin: ["agaariin bohirdol", "utaa"]
+    en: ["air pollution", "smog"]
+
+  disaster:
+    label_mn: гамшиг, онцгой нөхцөл (зуд, үер)
+    type: context
+    mn: ["зуд", "үерт", "үер ус", "үерийн", "гамшиг", "газар хөдл", "түймэр", "мал хорогд", "мал үхс"]
+    latin: ["zud", "gamshig"]
+    en: ["disaster", "flood", "dzud", "earthquake"]
+
+  violence:
+    label_mn: хүчирхийлэл
+    type: red_flag
+    mn: ["хүчирхийл", "зод", "дээрэлх", "бэлгийн хүчирхийл", "гэр бүлийн хүчирхийл", "бие махбодын шийтгэл", "айлгаж сүрдүүл"]
+    latin: ["huchirhiil", "khuchirkhiil"]
+    en: ["abuse", "domestic violence", "bullying", "child abuse"]
+
+  # set by Agent 2 when the user answers "тийм" (yes) to a red-flag screening question
+  screen_positive:
+    label_mn: анхаарах шинжийн асуултад «тийм» гэж хариулсан
+    type: red_flag
+
+  screen_positive_crisis:
+    label_mn: амиа хорлох / өөрийгөө гэмтээх бодлын асуултад «тийм» гэж хариулсан
+    type: red_flag
+
+  # --------------------------------------------------------- conditions
+  stroke_condition:
+    label_mn: тархины харвалт
+    type: condition
+    mn: ["харвалт", "цус харва", "тархины харва", "тархины цус"]
+    latin: ["harvalt", "kharvalt"]
+    en: ["stroke"]
+
+  heart_attack_condition:
+    label_mn: зүрхний шигдээс
+    type: condition
+    mn: ["шигдээс", "зүрхний шигд", "инфаркт"]
+    latin: ["shigdees"]
+    en: ["heart attack", "myocardial infarction"]
+
+  cold_flu:
+    label_mn: ханиад, томуу
+    type: condition
+    mn: ["ханиад", "томуу", "амьсгалын замын халдвар", "вирус тус"]
+    latin: ["haniad", "khaniad", "tomuu"]
+    en: ["cold", "flu", "influenza"]
+
+  hypertension:
+    label_mn: артерийн даралт ихсэх
+    type: condition
+    mn: ["даралт ихс", "даралт ихэс", "даралт өндөр", "даралт нэмэгд", "даралт тогт", "цусны даралт", "даралттай", "гипертони", "даралт ихдэ"]
+    latin: ["daralt", "daralt ihs"]
+    en: ["blood pressure", "hypertension"]
+
+  diabetes:
+    label_mn: чихрийн шижин
+    type: condition
+    mn: ["чихрийн шижин", "сахар ихс", "цусан дахь сахар", "диабет", "сахартай"]
+    latin: ["chihriin shijin"]
+    en: ["diabetes", "blood sugar"]
+
+  food_poisoning:
+    label_mn: хоолны хордлого
+    type: condition
+    mn: ["хоол хорд", "хоолонд хорд", "хоолны хордлого", "муудсан хоол", "мах хорд", "сүүнд хорд"]
+    latin: ["hoolond hord", "khoolond khord"]
+    en: ["food poisoning"]
+
+  dehydration:
+    label_mn: шингэн алдалт
+    type: condition
+    mn: ["шингэн алд", "шээс гарахгүй", "шээс бага", "ам цанга", "ам хата", "живх хуурай"]
+    en: ["dehydration", "dehydrated"]
+
+  measles:
+    label_mn: улаанбурхан
+    type: condition
+    mn: ["улаанбурхан", "улаан бурхан"]
+    latin: ["ulaanburhan", "ulaan burhan"]
+    en: ["measles"]
+
+  hepatitis:
+    label_mn: вируст гепатит (элэгний үрэвсэл)
+    type: condition
+    mn: ["гепатит", "элэг үрэвс", "элэгний үрэвсэл", "элэгний вирус", "элэгний хорт хавдар", "элэг хатуур"]
+    latin: ["gepatit", "eleg"]
+    en: ["hepatitis", "liver"]
+
+  hpv:
+    label_mn: ХПВ (хүний папиллома вирус), умайн хүзүүний хорт хавдар
+    type: condition
+    mn: ["хпв", "папиллома", "умайн хүзүүний хорт хавдар", "умайн хүзүүний хавдар", "умайн хүзүү"]
+    latin: ["hpv"]
+    en: ["hpv", "human papillomavirus", "cervical cancer"]
+
+  tobacco:
+    label_mn: тамхи, электрон тамхи
+    type: condition
+    mn: ["тамхи", "тамхид", "электрон тамхи", "вейп", "никотин", "кальян"]
+    latin: ["tamhi", "tamkhi", "veip"]
+    en: ["smoking", "tobacco", "cigarette", "e-cigarette", "vape", "vaping", "nicotine"]
+
+  # --------------------------------------------------------- medication
+  medication:
+    label_mn: эм, эмийн хэрэглээ
+    type: medication
+    mn: ["эм$", "эмийн$", "эмийг$", "эмээ уу", "тун$", "тунг$", "тунгаар", "антибиотик", "парацетамол", "ибупрофен", "аспирин", "анальгин", "шахмал", "таблет", "сироп", "ингалятор", "эм уух", "эм ууж"]
+    latin: ["em uuh", "antibiotik", "paracetamol"]
+    en: ["medicine", "medication", "pill", "dose", "dosage", "antibiotic", "paracetamol", "ibuprofen", "aspirin"]
+
+  side_effect:
+    label_mn: эмийн гаж нөлөө
+    type: medication
+    mn: ["гаж нөлөө", "эмэнд харшил", "эмийн харшил", "эм уусны дараа", "эм уугаад", "тариа хийлгэсний дараа", "тариа хийлгээд"]
+    latin: ["gaj noloo", "gaj nuluu"]
+    en: ["side effect", "adverse reaction", "drug allergy"]

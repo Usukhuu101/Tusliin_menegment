@@ -1,0 +1,20 @@
+# --- core (required) ---
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2.6
+pyyaml>=6.0
+numpy>=1.26
+
+# --- LLM (optional: only used when ANTHROPIC_API_KEY is set) ---
+anthropic>=2.0
+
+# --- data scripts (scripts/build_adr_summaries.py) ---
+pandas>=2.0
+openpyxl>=3.1
+
+# --- tests ---
+pytest>=8.0
+httpx>=0.27
+
+# --- optional: real multilingual embeddings (EMBEDDING_PROVIDER=sentence-transformers) ---
+# sentence-transformers>=3.0     # ~2 GB model download on first use

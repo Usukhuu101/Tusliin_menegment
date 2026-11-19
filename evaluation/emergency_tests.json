@@ -1,0 +1,138 @@
+[
+  {
+    "input": "Цээж маш хүчтэй өвдөөд амьсгал давчдаад байна.",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Ээжийн нүүр нэг тал руугаа мурийгаад үг ээдрээд байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Аав маань гэнэт гар хөл нь сулраад ярьж чадахгүй боллоо",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Цээжээр шахаж өвдөөд зүүн гар руу дамжаад хүйтэн хөлс гараад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Тариа хийлгэсний дараа хоолой хавдаад амьсгал боогдоод байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Уруул хэл хавдаад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Амьсгалж чадахгүй байна, уруул хөхөрсөн",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Хүүхэд маань таталт өгөөд байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Нөхөр маань ухаан алдчихлаа",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Гэрт угаартсан бололтой, бүгдээрээ толгой өвдөөд дотор муухайраад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Амиа хорлохыг хүсч байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Амьдрах хүсэл алга, үхмээр байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Охин маань олон ширхэг эм уучихсан",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Цус бөөлжөөд байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Шархнаас цус зогсохгүй байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Халуураад хүзүү хөшөөд толгой хүчтэй өвдөж байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Амьдралдаа хамгийн хүчтэй толгой өвдөлт гэнэт эхэлсэн",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "tseej owdood amisgal davchdaad bna",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "amia horloh bodol turuud bna",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Даралт 190/120 болоод толгой хүчтэй өвдөж байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Тарваганы мах идсэн, одоо халуураад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Толгойгоо цохиулсны дараа бөөлжөөд байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Гэнэт ухаан самуураад хүнээ танихгүй болсон",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Хэвлий гэнэт маш хүчтэй өвдөж байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "I have chest pain and shortness of breath",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Зүрх дэлсээд цээж өвдөөд байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Хүүхдийн арьсан дээр дарахад арилахгүй тууралт гарсан, халуунтай",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Зөгий хатгаад амьсгал давчдаж байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Хэт даараад ухаан самуураад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Цээж өвдөөд дотор муухайраад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "өөрийгөө гэмтээмээр санагдаад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Анафилаксийн шок болсон бололтой, хоолой бачуураад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Зуухны утаанд толгой өвдөөд дотор муухайраад байна",
+    "expected_risk": "EMERGENCY"
+  },
+  {
+    "input": "Гэрт утаа орсон, хүүхэд нойрмоглоод толгой эргээд байна",
+    "expected_risk": "EMERGENCY"
+  }
+]

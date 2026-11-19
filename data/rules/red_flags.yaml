@@ -1,0 +1,337 @@
+# =============================================================================
+# RED-FLAG / TRIAGE RULES  (Agent 1)  — MUST be reviewed by the medical advisor
+# -----------------------------------------------------------------------------
+# A rule fires when ALL its conditions hold:
+#   all:  [concepts]        every concept present
+#   any:  [concepts]        at least one present
+#   temp_gte, bp_sys_gte, severity_gte, duration_days_gte, age_months_lt,
+#   age_years_gte           numeric conditions on extracted facts
+#   requires_symptom: true  only if the user reported at least one symptom
+# risk: LOW | MODERATE | HIGH | EMERGENCY.  Final risk = highest fired rule.
+# template: emergency message (data/rules/emergency_templates.yaml).
+# File order = priority when choosing the emergency template.
+# Design goal: NEVER miss an emergency. Over-triage is acceptable.
+# =============================================================================
+version: "1.0"
+reviewed_by: null        # TODO: medical advisor name + date before production
+rules:
+  # ------------------------------------------------------------ EMERGENCY
+  - id: RF_SUICIDE
+    label_mn: Амиа хорлох бодол / өөрийгөө гэмтээх эрсдэл
+    risk: EMERGENCY
+    any: [suicidal]
+    template: crisis
+
+  - id: RF_SCREEN_POSITIVE_CRISIS
+    label_mn: Амиа хорлох / өөрийгөө гэмтээх бодлын асуултад «тийм» гэж хариулсан
+    risk: EMERGENCY
+    any: [screen_positive_crisis]
+    template: crisis
+
+  - id: RF_STROKE
+    label_mn: Тархины харвалтын шинж (нүүр мурийх, үг ээдрэх, гар хөл сулрах)
+    risk: EMERGENCY
+    any: [face_droop, slurred_speech, one_side_weakness]
+    template: stroke
+
+  - id: RF_CARDIAC_DYSPNEA
+    label_mn: Цээжээр өвдөх + амьсгал давчдах
+    risk: EMERGENCY
+    all: [chest_pain, dyspnea]
+    template: cardiac
+
+  - id: RF_CARDIAC_SIGNS
+    label_mn: Цээжээр өвдөх + (дамжих өвдөлт / хүйтэн хөлс / маш хүчтэй / дотор муухайрах)
+    risk: EMERGENCY
+    all: [chest_pain]
+    any: [radiating_pain, cold_sweat, severe_intensity, nausea, unconscious, dizziness]
+    template: cardiac
+
+  - id: RF_SEVERE_DYSPNEA
+    label_mn: Амьсгал боогдох, уруул хөхрөх
+    risk: EMERGENCY
+    any: [severe_dyspnea]
+    template: breathing
+
+  - id: RF_ANAPHYLAXIS
+    label_mn: Уруул, хэл, хоолой хавдах (хүнд харшил)
+    risk: EMERGENCY
+    any: [throat_swelling]
+    template: anaphylaxis
+
+  - id: RF_ANAPHYLAXIS_2
+    label_mn: Харшил / эм, тарианы дараа амьсгал давчдах
+    risk: EMERGENCY
+    all: [allergy_context]
+    any: [dyspnea, dizziness, unconscious]
+    template: anaphylaxis
+
+  - id: RF_UNCONSCIOUS
+    label_mn: Ухаан алдах, таталт өгөх
+    risk: EMERGENCY
+    any: [unconscious, seizure]
+    template: unconscious
+
+  - id: RF_CONFUSION
+    label_mn: Гэнэт ухаан самуурах
+    risk: EMERGENCY
+    any: [confusion]
+    template: general
+
+  - id: RF_CO_POISONING
+    label_mn: Угаарын хийн хордлого сэжиг
+    risk: EMERGENCY
+    any: [co_exposure]
+    template: co_poisoning
+
+  - id: RF_CO_SMOKE_SYMPTOMS
+    label_mn: Зуух / нүүрсний утаатай орчинд толгой өвдөх, эргэх, дотор муухайрах (угаарын хий сэжиг)
+    risk: EMERGENCY
+    all: [smoke_exposure]
+    any: [headache, dizziness, nausea, vomiting, unconscious, confusion, dyspnea, fatigue]
+    template: co_poisoning
+
+  - id: RF_OVERDOSE
+    label_mn: Эм хэтрүүлэх / хор, химийн бодис залгих
+    risk: EMERGENCY
+    any: [overdose_poison]
+    template: poisoning
+
+  - id: RF_BLEEDING
+    label_mn: Их хэмжээгээр цус алдах
+    risk: EMERGENCY
+    any: [severe_bleeding]
+    template: bleeding
+
+  - id: RF_VOMIT_BLOOD
+    label_mn: Цус бөөлжих / цус ханиалгах
+    risk: EMERGENCY
+    any: [vomiting_blood]
+    template: bleeding
+
+  - id: RF_MENINGITIS
+    label_mn: Халууралт / толгой өвдөх + хүзүү хөших
+    risk: EMERGENCY
+    all: [stiff_neck]
+    any: [fever, headache, vomiting]
+    template: infection
+
+  - id: RF_NON_BLANCHING_RASH
+    label_mn: Дарахад арилахгүй тууралт
+    risk: EMERGENCY
+    any: [non_blanching_rash]
+    template: infection
+
+  - id: RF_THUNDERCLAP
+    label_mn: Гэнэт эхэлсэн, урьд өмнө байгаагүй хүчтэй толгой өвдөлт
+    risk: EMERGENCY
+    all: [headache]
+    any: [worst_ever]
+    template: neuro
+
+  - id: RF_THUNDERCLAP_2
+    label_mn: Гэнэт эхэлсэн маш хүчтэй толгой өвдөлт
+    risk: EMERGENCY
+    all: [headache, sudden_onset, severe_intensity]
+    template: neuro
+
+  - id: RF_HEAD_INJURY_RED
+    label_mn: Толгойн гэмтлийн дараа бөөлжих / ухаан балартах
+    risk: EMERGENCY
+    all: [head_injury]
+    any: [vomiting, unconscious, confusion, seizure, vision_change]
+    template: neuro
+
+  - id: RF_HYPOTHERMIA_SEVERE
+    label_mn: Хэт даарах + ухаан самуурах
+    risk: EMERGENCY
+    all: [hypothermia]
+    any: [confusion, unconscious, slurred_speech]
+    template: hypothermia
+
+  - id: RF_BP_CRISIS
+    label_mn: Даралт 180/120-оос дээш + шинж тэмдэг
+    risk: EMERGENCY
+    bp_sys_gte: 180
+    any: [headache, chest_pain, dyspnea, vision_change, confusion, dizziness]
+    template: general
+
+  - id: RF_PLAGUE
+    label_mn: Тарвагатай холбоотой халууралт / булчирхай хавдах (тарваган тахлын эрсдэл)
+    risk: EMERGENCY
+    all: [plague_risk]
+    any: [fever, swollen_lymph, cough]
+    template: infection
+
+  - id: RF_ABDOMEN_ACUTE
+    label_mn: Гэнэт эхэлсэн маш хүчтэй хэвлийн өвдөлт
+    risk: EMERGENCY
+    all: [abdominal_pain, sudden_onset, severe_intensity]
+    template: general
+
+  - id: RF_PALPITATION_RED
+    label_mn: Зүрх дэлсэх + цээжээр өвдөх / ухаан балартах
+    risk: EMERGENCY
+    all: [palpitations]
+    any: [chest_pain, unconscious, dyspnea]
+    template: cardiac
+
+  # ----------------------------------------------------------------- HIGH
+  - id: RF_SCREEN_POSITIVE
+    label_mn: Анхаарах шинжийн асуултад «тийм» гэж хариулсан
+    risk: HIGH
+    any: [screen_positive]
+
+  - id: RF_VIOLENCE
+    label_mn: Хүчирхийлэлд өртсөн байж болзошгүй — аюулгүй байдал, гэмтлээ шалгуулах
+    risk: HIGH
+    any: [violence]
+
+  - id: RF_CHEST_PAIN
+    label_mn: Цээжээр өвдөх
+    risk: HIGH
+    any: [chest_pain]
+
+  - id: RF_DYSPNEA
+    label_mn: Амьсгал давчдах
+    risk: HIGH
+    any: [dyspnea]
+
+  - id: RF_VISION
+    label_mn: Хараа муудах, бүрэлзэх
+    risk: HIGH
+    any: [vision_change]
+
+  - id: RF_INFANT_FEVER
+    label_mn: 3 сар хүрээгүй нярай халуурах
+    risk: HIGH
+    all: [fever]
+    age_months_lt: 3
+
+  - id: RF_INFANT_FEVER_2
+    label_mn: Нярай хүүхэд халуурах
+    risk: HIGH
+    all: [fever, infant]
+
+  - id: RF_FEVER_40
+    label_mn: Биеийн халуун 40°C ба түүнээс дээш
+    risk: HIGH
+    temp_gte: 40
+
+  - id: RF_BP_HIGH
+    label_mn: Даралт 180-аас дээш
+    risk: HIGH
+    bp_sys_gte: 180
+
+  - id: RF_BLOOD_STOOL
+    label_mn: Хар эсвэл цустай өтгөн
+    risk: HIGH
+    any: [blood_in_stool]
+
+  - id: RF_JAUNDICE
+    label_mn: Арьс, нүд шарлах
+    risk: HIGH
+    any: [jaundice]
+
+  - id: RF_HEAD_INJURY
+    label_mn: Толгойн гэмтэл
+    risk: HIGH
+    any: [head_injury]
+
+  - id: RF_HYPOTHERMIA
+    label_mn: Хэт даарах
+    risk: HIGH
+    any: [hypothermia]
+
+  - id: RF_PREGNANCY_SYMPTOM
+    label_mn: Жирэмсэн үед хэвлийгээр өвдөх / толгой хүчтэй өвдөх / хараа муудах
+    risk: HIGH
+    all: [pregnancy]
+    any: [abdominal_pain, vision_change, severe_intensity, headache]
+
+  - id: RF_INFANT_GI
+    label_mn: Нярай хүүхэд суулгах / бөөлжих
+    risk: HIGH
+    all: [infant]
+    any: [diarrhea, vomiting, dehydration]
+
+  - id: RF_DEHYDRATION_RISK
+    label_mn: Шингэн алдалт (хүүхэд, өндөр настан)
+    risk: HIGH
+    all: [dehydration]
+    any: [child, infant, elderly]
+
+  - id: RF_BURN_CHILD
+    label_mn: Хүүхэд түлэгдэх
+    risk: HIGH
+    all: [burn]
+    any: [child, infant]
+
+  - id: RF_ABDOMEN_SEVERE
+    label_mn: Хэвлийгээр маш хүчтэй өвдөх
+    risk: HIGH
+    all: [abdominal_pain, severe_intensity]
+
+  - id: RF_SIDE_EFFECT_ALLERGY
+    label_mn: Эм, тарианы дараа тууралт / загатнаа
+    risk: MODERATE
+    all: [allergy_context]
+    any: [rash, itching]
+
+  # ------------------------------------------------------------- MODERATE
+  - id: RF_FEVER_39
+    label_mn: Биеийн халуун 39°C ба түүнээс дээш
+    risk: MODERATE
+    temp_gte: 39
+
+  - id: RF_SEVERE_PAIN_SCORE
+    label_mn: Өвдөлт 8/10 ба түүнээс дээш
+    risk: MODERATE
+    severity_gte: 8
+    requires_symptom: true
+
+  - id: RF_LONG_DURATION
+    label_mn: Шинж 2 долоо хоногоос удаан үргэлжилсэн
+    risk: MODERATE
+    duration_days_gte: 14
+    requires_symptom: true
+
+  - id: RF_DEHYDRATION
+    label_mn: Шингэн алдалтын шинж
+    risk: MODERATE
+    any: [dehydration]
+
+  - id: RF_PALPITATIONS
+    label_mn: Зүрх дэлсэх
+    risk: MODERATE
+    any: [palpitations]
+
+  - id: RF_BURN
+    label_mn: Түлэгдэл
+    risk: MODERATE
+    any: [burn]
+
+  - id: RF_FROSTBITE
+    label_mn: Хөлдөлт
+    risk: MODERATE
+    any: [frostbite]
+
+  - id: RF_BP_ELEVATED
+    label_mn: Даралт 140/90-ээс дээш
+    risk: MODERATE
+    bp_sys_gte: 140
+
+# Risk modifiers: if the person is in a vulnerable group and has symptoms,
+# raise LOW->MODERATE or MODERATE->HIGH (never directly to EMERGENCY).
+modifiers:
+  - id: MOD_INFANT
+    label_mn: Нярай / 1 хүртэлх насны хүүхэд
+    any: [infant]
+    age_months_lt: 12
+  - id: MOD_ELDERLY
+    label_mn: Өндөр настан (65+)
+    any: [elderly]
+    age_years_gte: 65
+  - id: MOD_PREGNANCY
+    label_mn: Жирэмсэн
+    any: [pregnancy]

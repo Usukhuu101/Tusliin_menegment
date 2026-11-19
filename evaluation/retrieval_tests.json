@@ -1,0 +1,228 @@
+[
+  {
+    "query": "толгой өвдөөд байна",
+    "expected_docs": [
+      "MED_SYM_001"
+    ]
+  },
+  {
+    "query": "tolgoi ovdood bna",
+    "expected_docs": [
+      "MED_SYM_001"
+    ]
+  },
+  {
+    "query": "халуураад байна",
+    "expected_docs": [
+      "MED_SYM_002",
+      "MED_SYM_003",
+      "MED_DIS_001"
+    ]
+  },
+  {
+    "query": "хүүхэд маань халуураад байна",
+    "expected_docs": [
+      "MED_SYM_003"
+    ]
+  },
+  {
+    "query": "ханиалгаад байна",
+    "expected_docs": [
+      "MED_SYM_004",
+      "MED_DIS_001"
+    ]
+  },
+  {
+    "query": "хоолой өвдөж байна",
+    "expected_docs": [
+      "MED_SYM_005",
+      "MED_DIS_001"
+    ]
+  },
+  {
+    "query": "гэдэс өвдөөд байна",
+    "expected_docs": [
+      "MED_SYM_006"
+    ]
+  },
+  {
+    "query": "суулгаад байна",
+    "expected_docs": [
+      "MED_SYM_007",
+      "MED_DIS_003"
+    ]
+  },
+  {
+    "query": "бөөлжөөд байна",
+    "expected_docs": [
+      "MED_SYM_007",
+      "MED_DIS_003"
+    ]
+  },
+  {
+    "query": "нуруу өвдөөд байна",
+    "expected_docs": [
+      "MED_SYM_008"
+    ]
+  },
+  {
+    "query": "арьсан дээр тууралт гарсан",
+    "expected_docs": [
+      "MED_SYM_009"
+    ]
+  },
+  {
+    "query": "толгой эргээд байна",
+    "expected_docs": [
+      "MED_SYM_010"
+    ]
+  },
+  {
+    "query": "амьсгаадаад байна",
+    "expected_docs": [
+      "MED_SYM_011"
+    ]
+  },
+  {
+    "query": "цээжээр өвдөж байна",
+    "expected_docs": [
+      "MED_SYM_012",
+      "MED_EMG_001"
+    ]
+  },
+  {
+    "query": "зүрхний шигдээсийн шинж юу вэ",
+    "expected_docs": [
+      "MED_EMG_001"
+    ]
+  },
+  {
+    "query": "тархины харвалтын шинж",
+    "expected_docs": [
+      "MED_EMG_002"
+    ]
+  },
+  {
+    "query": "хоолой хавдаад харшил өгсөн",
+    "expected_docs": [
+      "MED_EMG_003",
+      "MED_SYM_009"
+    ]
+  },
+  {
+    "query": "угаарын хийн хордлого",
+    "expected_docs": [
+      "MED_EMG_004"
+    ]
+  },
+  {
+    "query": "амиа хорлох бодол",
+    "expected_docs": [
+      "MED_EMG_005"
+    ]
+  },
+  {
+    "query": "ханиад томуу",
+    "expected_docs": [
+      "MED_DIS_001"
+    ]
+  },
+  {
+    "query": "даралт ихсэлт гэж юу вэ",
+    "expected_docs": [
+      "MED_DIS_002"
+    ]
+  },
+  {
+    "query": "хоолонд хордсон",
+    "expected_docs": [
+      "MED_DIS_003"
+    ]
+  },
+  {
+    "query": "улаанбурхан",
+    "expected_docs": [
+      "MED_DIS_004"
+    ]
+  },
+  {
+    "query": "элэгний вирус гепатит",
+    "expected_docs": [
+      "MED_DIS_005"
+    ]
+  },
+  {
+    "query": "шингэн алдалт",
+    "expected_docs": [
+      "MED_DIS_006"
+    ]
+  },
+  {
+    "query": "буцалсан усанд түлэгдсэн",
+    "expected_docs": [
+      "MED_FA_001"
+    ]
+  },
+  {
+    "query": "хуруу хөлдсөн",
+    "expected_docs": [
+      "MED_FA_002"
+    ]
+  },
+  {
+    "query": "эмийн гаж нөлөө",
+    "expected_docs": [
+      "MED_MED_001"
+    ]
+  },
+  {
+    "query": "цефтриаксон тариа хийлгээд тууралт гарсан",
+    "expected_title_contains": "Цефтриаксон"
+  },
+  {
+    "query": "цефотаксим гаж нөлөө",
+    "expected_title_contains": "Цефотаксим"
+  },
+  {
+    "query": "агаарын бохирдол хүүхдэд хортой юу",
+    "expected_docs": [
+      "MED_PRV_001"
+    ]
+  },
+  {
+    "query": "нүүрсний утаа эрүүл мэндэд яаж нөлөөлдөг вэ",
+    "expected_docs": [
+      "MED_PRV_001"
+    ]
+  },
+  {
+    "query": "ХПВ вакцин хэдэн настай хүүхдэд хийдэг вэ",
+    "expected_docs": [
+      "MED_PRV_002"
+    ]
+  },
+  {
+    "query": "хүүхдийн эсрэг хүчирхийлэл",
+    "expected_docs": [
+      "MED_PRV_003"
+    ]
+  },
+  {
+    "query": "зуданд мал хорогдоод стресс түгшүүртэй байна",
+    "expected_docs": [
+      "MED_PRV_004"
+    ]
+  },
+  {
+    "query": "тамхинаас гарах арга",
+    "expected_docs": [
+      "MED_PRV_005"
+    ]
+  },
+  {
+    "query": "электрон тамхи хортой юу",
+    "expected_docs": [
+      "MED_PRV_005"
+    ]
+  }
+]

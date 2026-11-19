@@ -1,0 +1,141 @@
+# =============================================================================
+# FOLLOW-UP QUESTION PROTOCOLS (Agent 2)
+# For each symptom: which facts we need and the exact question to ask.
+# Questions are reviewed text — the LLM never invents follow-up questions.
+# Order matters: red-flag screening first, then duration, severity, ...
+# Slots: red_flag_screen | duration | severity | temperature | age
+# A clear "тийм / yes" to a red_flag_screen question adds the concept in
+# `positive_concept` (default: screen_positive -> HIGH risk in red_flags.yaml).
+# =============================================================================
+version: "1.0"
+default:
+  - slot: red_flag_screen
+    question: "Амьсгал давчдах, цээжээр өвдөх, ухаан балартах, өндөр халуурах зэрэг шинж байна уу?"
+  - slot: duration
+    question: "Энэ шинж хэзээнээс эхэлсэн бэ?"
+  - slot: severity
+    question: "1–10 оноогоор үнэлбэл хэр хүчтэй байна вэ? (1 = маш бага, 10 = тэсэхийн аргагүй)"
+
+protocols:
+  headache:
+    - slot: red_flag_screen
+      question: "Халуурах, бөөлжих, хараа муудах, гар хөл сулрах, хүзүү хөших зэрэг шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс толгой өвдөж эхэлсэн бэ?"
+    - slot: severity
+      question: "Өвдөлтөө 1–10 оноогоор үнэлбэл хэд вэ?"
+
+  fever:
+    - slot: red_flag_screen
+      question: "Амьсгал давчдах, хүзүү хөших, дарахад арилахгүй тууралт, таталт, ухаан балартах шинж байна уу?"
+    - slot: temperature
+      question: "Биеийн халуун хэд хүрсэн бэ (хэмжсэн бол)?"
+    - slot: age
+      question: "Хэдэн настай хүн бэ? (Хүүхэд бол хэдэн сартай / настай вэ?)"
+    - slot: duration
+      question: "Хэзээнээс халуурч эхэлсэн бэ?"
+
+  cough:
+    - slot: red_flag_screen
+      question: "Амьсгал давчдах, цээжээр өвдөх, цус ханиалгах, өндөр халуурах шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс ханиалгаж эхэлсэн бэ?"
+    - slot: age
+      question: "Хэдэн настай хүн бэ?"
+
+  sore_throat:
+    - slot: red_flag_screen
+      question: "Залгих, амьсгалахад маш хэцүү байна уу? Шүлсээ залгиж чадахгүй байна уу?"
+    - slot: duration
+      question: "Хэзээнээс хоолой өвдөж эхэлсэн бэ?"
+    - slot: temperature
+      question: "Халуурч байна уу? Хэмжсэн бол хэд вэ?"
+
+  abdominal_pain:
+    - slot: red_flag_screen
+      question: "Цустай эсвэл хар өнгөтэй бөөлжис / өтгөн гарсан уу? Хэвлийд хүрэхэд маш хүчтэй өвдөж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс өвдөж эхэлсэн бэ?"
+    - slot: severity
+      question: "Өвдөлтөө 1–10 оноогоор үнэлбэл хэд вэ?"
+
+  diarrhea:
+    - slot: red_flag_screen
+      question: "Өтгөнд цус гарсан уу? Шээс бараг гарахгүй, хэт ядрах шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс суулгаж эхэлсэн бэ?"
+    - slot: age
+      question: "Хэдэн настай хүн бэ?"
+
+  vomiting:
+    - slot: red_flag_screen
+      question: "Цустай эсвэл ногоон бөөлжис гарсан уу? Шингэн огт тогтоохгүй байна уу?"
+    - slot: duration
+      question: "Хэзээнээс бөөлжиж эхэлсэн бэ?"
+    - slot: age
+      question: "Хэдэн настай хүн бэ?"
+
+  nausea:
+    - slot: red_flag_screen
+      question: "Хэвлийгээр хүчтэй өвдөх, цээжээр өвдөх, толгой хүчтэй өвдөх шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс дотор муухайрч эхэлсэн бэ?"
+
+  back_pain:
+    - slot: red_flag_screen
+      question: "Хөл мэдээ алдах, сулрах эсвэл шээс, өтгөнөө барьж чадахгүй болох шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс нуруу өвдөж эхэлсэн бэ?"
+    - slot: severity
+      question: "Өвдөлтөө 1–10 оноогоор үнэлбэл хэд вэ?"
+
+  rash:
+    - slot: red_flag_screen
+      question: "Уруул, нүүр, хоолой хавдах эсвэл амьсгал давчдах шинж байна уу? Шинэ эм, хоол хэрэглэсэн үү?"
+    - slot: duration
+      question: "Тууралт хэзээнээс гарсан бэ?"
+
+  itching:
+    - slot: red_flag_screen
+      question: "Уруул, нүүр, хоолой хавдах эсвэл амьсгал давчдах шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс загатнаж эхэлсэн бэ?"
+
+  dizziness:
+    - slot: red_flag_screen
+      question: "Цээжээр өвдөх, нүүр мурийх, гар хөл сулрах, үг ээдрэх, ухаан алдах шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс толгой эргэж эхэлсэн бэ?"
+
+  burn:
+    - slot: red_flag_screen
+      question: "Түлэгдсэн хэсэг алганаас том уу? Нүүр, гар, бэлэг эрхтэн түлэгдсэн үү? Цахилгаан эсвэл химийн бодисоор түлэгдсэн үү?"
+    - slot: age
+      question: "Түлэгдсэн хүн хэдэн настай вэ?"
+
+  frostbite:
+    - slot: red_flag_screen
+      question: "Хөлдсөн хэсэг цайж хатуурсан, мэдрэхгүй болсон эсвэл хүн чичирч, ухаан самуурч байна уу?"
+    - slot: duration
+      question: "Хэр удаан хүйтэнд байсан бэ?"
+
+  fatigue:
+    - slot: red_flag_screen
+      question: "Амьсгал давчдах, цээжээр өвдөх, турах, шөнө хөлрөх шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс ядарч эхэлсэн бэ?"
+
+  stress:
+    - slot: red_flag_screen
+      question: "Өөрийгөө гэмтээх эсвэл амиа хорлох бодол төрж байна уу?"
+      positive_concept: screen_positive_crisis
+    - slot: duration
+      question: "Хэзээнээс ийм байдалтай байна вэ?"
+    - slot: severity
+      question: "Өдөр тутмын амьдрал, нойр, ажилд тань хэр их саад болж байна вэ? (1–10)"
+
+  runny_nose:
+    - slot: red_flag_screen
+      question: "Өндөр халуурах, амьсгал давчдах шинж байна уу?"
+    - slot: duration
+      question: "Хэзээнээс эхэлсэн бэ?"

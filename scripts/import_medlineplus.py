@@ -1,0 +1,118 @@
+"""
+Import MedlinePlus synonyms (data/raw/medlineplus/) into the concept lexicon.
+
+Each line   * **A / B** $\\rightarrow$ Canonical Topic; Other Topic
+means "A" and "B" are other names for "Canonical Topic".
+
+Outputs:
+  data/cleaned/medlineplus_synonyms.json          structured synonym table
+  data/nlp/generated_medlineplus_lexicon.yaml     loaded automatically by the chatbot
+
+Effect in the chatbot:
+  * English names of topics we HAVE (e.g. "Sugar Diabetes", "Strep Throat")
+    are added to existing concepts -> better understanding.
+  * Topics we do NOT have a document for (e.g. "Leukemia") become recognised
+    concepts. The chatbot still answers "not enough reliable information"
+    (no hallucination) but the knowledge-gap log now names the exact topic,
+    so the content team knows what to write next.
+
+Run:  python scripts/import_medlineplus.py
+"""
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "data" / "raw" / "medlineplus" / "medlineplus_markdown.md"
+OUT_JSON = ROOT / "data" / "cleaned" / "medlineplus_synonyms.json"
+OUT_LEX = ROOT / "data" / "nlp" / "generated_medlineplus_lexicon.yaml"
+MAIN_LEX = ROOT / "data" / "nlp" / "concept_lexicon.yaml"
+
+# canonical MedlinePlus topic (lower-case) -> existing concept id
+CANONICAL_TO_CONCEPT = {
+    "diabetes type 1": "diabetes", "diabetes type 2": "diabetes", "diabetes in children and teens": "diabetes",
+    "diabetes and pregnancy": "diabetes", "diabetes medicines": "diabetes", "blood glucose": "diabetes",
+    "how to prevent diabetes": "diabetes", "diabetic kidney problems": "diabetes", "diabetic eye problems": "diabetes",
+    "prediabetes": "diabetes", "metabolic syndrome": "diabetes",
+    "blood pressure medicines": "hypertension", "dash eating plan": "hypertension",
+    "cold and cough medicines": "cough", "acute bronchitis": "cough", "chronic bronchitis": "cough",
+    "winter weather emergencies": "hypothermia",
+    "foodborne illness": "food_poisoning", "norovirus infections": "diarrhea",
+    "medicines": "medication", "over-the-counter medicines": "medication", "medicines and children": "medication",
+    "child abuse": "violence", "child sexual abuse": "violence", "teen violence": "violence",
+    "fluid and electrolyte balance": "dehydration",
+}
+# individual synonym (lower-case) -> concept, when the canonical topic is broader
+SYNONYM_TO_CONCEPT = {"strep throat": "sore_throat"}
+SKIP_GENERIC = {"fitness", "violence", "cold (temperature)", "electrolytes", "natural disasters", "colic"}
+
+
+def slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")[:48]
+
+
+def clean_term(t: str) -> str:
+    t = re.sub(r"\(.*?\)", "", t).replace("*", "").strip(" .,:;?")
+    return re.sub(r"\s+", " ", t)
+
+
+def main() -> None:
+    text = SRC.read_text(encoding="utf-8")
+    existing_en = set()
+    main_lex = yaml.safe_load(MAIN_LEX.read_text(encoding="utf-8"))["concepts"]
+    for spec in main_lex.values():
+        existing_en |= {e.lower() for e in spec.get("en", []) or []}
+
+    rows, section, url = [], None, None
+    for line in text.splitlines():
+        if m := re.match(r"^##\s+\d+\.\s+(.*)", line):
+            section = m.group(1).strip()
+        elif m := re.search(r"\*\*URL:\*\*\s*(\S+)", line):
+            url = m.group(1)
+        elif m := re.match(r"^\*\s+\*\*(.+?)\*\*\s*\$\\rightarrow\$\s*(.+)$", line.strip()):
+            synonyms = [clean_term(s) for s in m.group(1).split("/") if clean_term(s)]
+            targets = [clean_term(t) for t in m.group(2).split(";") if clean_term(t)]
+            rows.append({"section": section, "section_url": url, "synonyms": synonyms, "topics": targets})
+
+    concepts: dict[str, dict] = {}
+    stats = {"mapped_to_existing": 0, "new_topics": 0, "skipped": 0}
+    for r in rows:
+        for topic in r["topics"]:
+            cid = CANONICAL_TO_CONCEPT.get(topic.lower())
+            new = cid is None
+            if new:
+                cid = f"mlp_{slug(topic)}"
+                concepts.setdefault(cid, {"label_mn": topic, "type": "condition", "en": []})
+                concepts[cid]["en"].append(topic.lower())          # the topic name itself is also a term
+            else:
+                concepts.setdefault(cid, {"en": []})
+            for syn in r["synonyms"]:
+                low = syn.lower()
+                target = SYNONYM_TO_CONCEPT.get(low, cid)
+                if low in SKIP_GENERIC or low in existing_en or len(low) < 4:
+                    stats["skipped"] += 1
+                    continue
+                concepts.setdefault(target, {"en": []})["en"].append(low)
+                stats["mapped_to_existing" if not target.startswith("mlp_") else "new_topics"] += 1
+
+    for spec in concepts.values():
+        spec["en"] = sorted(set(spec["en"]))
+    OUT_JSON.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    OUT_LEX.write_text(
+        "# AUTO-GENERATED by scripts/import_medlineplus.py from MedlinePlus (medlineplus.gov) — do not edit by hand\n"
+        + yaml.safe_dump({"version": "generated", "concepts": concepts}, allow_unicode=True, sort_keys=True),
+        encoding="utf-8",
+    )
+    existing = sorted(c for c in concepts if not c.startswith("mlp_"))
+    print(f"{len(rows)} MedlinePlus lines -> {len(concepts)} concepts")
+    print(f"  enriched existing concepts: {existing}")
+    print(f"  new recognised topics (no KB document yet): {sum(c.startswith('mlp_') for c in concepts)}")
+    print(f"  synonyms: {stats}")
+
+
+if __name__ == "__main__":
+    main()

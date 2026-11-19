@@ -1,0 +1,209 @@
+[
+  {
+    "name": "greeting",
+    "turns": [
+      {
+        "input": "Сайн байна уу",
+        "expect_type": "GREETING"
+      }
+    ]
+  },
+  {
+    "name": "thanks",
+    "turns": [
+      {
+        "input": "Баярлалаа",
+        "expect_type": "THANKS"
+      }
+    ]
+  },
+  {
+    "name": "out_of_scope",
+    "turns": [
+      {
+        "input": "Маргааш цаг агаар ямар байх вэ",
+        "expect_type": "OUT_OF_SCOPE"
+      }
+    ]
+  },
+  {
+    "name": "headache_followup_flow",
+    "turns": [
+      {
+        "input": "Толгой өвдөөд байна",
+        "expect_type": "FOLLOWUP"
+      },
+      {
+        "input": "Өчигдрөөс, 6 оноо. Тийм шинж байхгүй",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_SYM_001",
+        "expect_risk": "LOW"
+      }
+    ]
+  },
+  {
+    "name": "latin_headache_flow",
+    "turns": [
+      {
+        "input": "tolgoi owdood bna",
+        "expect_type": "FOLLOWUP"
+      },
+      {
+        "input": "2 honog, 5",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_SYM_001"
+      }
+    ]
+  },
+  {
+    "name": "chest_pain_no_followup_then_emergency",
+    "turns": [
+      {
+        "input": "Цээж өвдөөд байна",
+        "expect_type": "ANSWER",
+        "expect_risk": "HIGH"
+      },
+      {
+        "input": "Одоо амьсгал давчдаад байна",
+        "expect_type": "EMERGENCY"
+      }
+    ]
+  },
+  {
+    "name": "general_info_hypertension",
+    "turns": [
+      {
+        "input": "Даралт ихсэлт гэж юу вэ?",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_DIS_002"
+      }
+    ]
+  },
+  {
+    "name": "general_info_measles",
+    "turns": [
+      {
+        "input": "Улаанбурхан гэж юу вэ, яаж сэргийлэх вэ?",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_DIS_004"
+      }
+    ]
+  },
+  {
+    "name": "general_info_cold_flu_url_with_parentheses",
+    "turns": [
+      {
+        "input": "Ханиад томуу гэж юу вэ?",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_DIS_001"
+      }
+    ]
+  },
+  {
+    "name": "emergency_direct",
+    "turns": [
+      {
+        "input": "Цээж маш хүчтэй өвдөөд амьсгал давчдаад байна.",
+        "expect_type": "EMERGENCY",
+        "expect_contains": "103"
+      }
+    ]
+  },
+  {
+    "name": "crisis",
+    "turns": [
+      {
+        "input": "Үхмээр байна, амьдрах хүсэл алга",
+        "expect_type": "EMERGENCY",
+        "expect_contains": "103"
+      }
+    ]
+  },
+  {
+    "name": "child_fever_answer",
+    "turns": [
+      {
+        "input": "5 настай хүүхэд маань 38.5 халуураад байна",
+        "expect_type": "FOLLOWUP"
+      },
+      {
+        "input": "Өчигдрөөс. Үгүй, тийм шинж алга",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_SYM_003"
+      }
+    ]
+  },
+  {
+    "name": "pii_redaction",
+    "turns": [
+      {
+        "input": "Миний утас 99112233, РД УБ99112233. Толгой өвдөөд байна",
+        "expect_type": "FOLLOWUP",
+        "expect_not_contains": "99112233"
+      }
+    ]
+  },
+  {
+    "name": "smoke_question_is_not_emergency",
+    "turns": [
+      {
+        "input": "Нүүрсний утаа хүүхдэд яаж нөлөөлдөг вэ?",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_PRV_001"
+      }
+    ]
+  },
+  {
+    "name": "yes_to_red_flag_screen_raises_risk",
+    "turns": [
+      {
+        "input": "Толгой өвдөөд байна",
+        "expect_type": "FOLLOWUP"
+      },
+      {
+        "input": "Тийм",
+        "expect_type": "ANSWER",
+        "expect_risk": "HIGH",
+        "expect_doc": "MED_SYM_001"
+      }
+    ]
+  },
+  {
+    "name": "stress_screen_yes_is_crisis",
+    "turns": [
+      {
+        "input": "Сүүлийн үед их стресстэй, сэтгэл түгшээд байна",
+        "expect_type": "FOLLOWUP"
+      },
+      {
+        "input": "Тийм",
+        "expect_type": "EMERGENCY",
+        "expect_contains": "103"
+      }
+    ]
+  },
+  {
+    "name": "stress_screen_no_gives_answer",
+    "turns": [
+      {
+        "input": "Зуданд малаа алдаад сэтгэл санаа их тавгүй байна",
+        "expect_type": "FOLLOWUP"
+      },
+      {
+        "input": "Үгүй. 2 долоо хоног, 6",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_PRV_004"
+      }
+    ]
+  },
+  {
+    "name": "hpv_info",
+    "turns": [
+      {
+        "input": "ХПВ вакцин гэж юу вэ?",
+        "expect_type": "ANSWER",
+        "expect_doc": "MED_PRV_002"
+      }
+    ]
+  }
+]

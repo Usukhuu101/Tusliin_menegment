@@ -1,0 +1,23 @@
+# secrets
+.env
+
+# generated / runtime
+storage/
+evaluation/results/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# raw data may contain sensitive case reports — keep it out of public repos
+data/raw/**/*.xlsx
+data/raw/**/*.csv
+data/raw/**/*.json
+data/cleaned/adr_records.csv
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

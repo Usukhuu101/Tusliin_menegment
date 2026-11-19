@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Эрүүл Мэндийн Туслах</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <a class="emergency-bar" href="tel:103">🚑 Яаралтай үед <strong>103</strong> дугаарт залгаарай</a>
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">✚</div>
+      <div>
+        <h1>Эрүүл Мэндийн Туслах</h1>
+        <p class="sub">Ерөнхий мэдээлэл · Эмчийн үзлэгийг орлохгүй</p>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="mode" class="mode" title="Ажиллах горим">…</span>
+      <button id="agentsToggle" class="ghost" type="button" title="Агент бүрийн ажлыг харуулах">🧠 Агентууд</button>
+      <button id="newChat" class="ghost" type="button">＋ Шинэ яриа</button>
+    </div>
+  </header>
+
+  <main id="chat" class="chat" aria-live="polite">
+    <div class="welcome" id="welcome">
+      <h2>Сайн байна уу! 👋</h2>
+      <p>Шинж тэмдгээ эсвэл асуултаа бичээрэй. Би баталгаат эх сурвалжид үндэслэн ерөнхий мэдээлэл өгч, анхаарах шинжийг тань үнэлнэ.</p>
+      <div class="chips" id="chips">
+        <button type="button">Өчигдрөөс толгой өвдөөд байна</button>
+        <button type="button">Хүүхэд маань 38.5 халуураад байна</button>
+        <button type="button">Даралт ихсэлт гэж юу вэ?</button>
+        <button type="button">tolgoi ovdood bna</button>
+        <button type="button">Цефтриаксон хийлгээд тууралт гарсан</button>
+      </div>
+    </div>
+  </main>
+
+  <form id="form" class="composer" autocomplete="off">
+    <textarea id="input" rows="1" maxlength="2000" placeholder="Шинж тэмдэг, асуултаа бичнэ үү… (нэр, утас, РД бүү бичээрэй)" aria-label="Мессеж"></textarea>
+    <button id="send" type="submit" aria-label="Илгээх">➤</button>
+  </form>
+  <footer class="foot">
+    Энэ бол оюутны төслийн туршилтын хувилбар. Мэдээлэл нь эмчийн хяналтаар бүрэн батлагдаагүй байж болно.
+    <button id="deleteData" class="link" type="button">Миний яриаг устгах</button>
+  </footer>
+
+  <dialog id="consent">
+    <h3>Эхлэхээс өмнө</h3>
+    <ul>
+      <li>Энэ чатбот <strong>эмч биш</strong>. Онош тавих, эм бичих боломжгүй.</li>
+      <li>Яаралтай үед шууд <strong>103</strong> дугаарт залгаарай.</li>
+      <li>Нэр, утас, регистрийн дугаар зэрэг хувийн мэдээллээ <strong>бүү бичээрэй</strong> — бичсэн ч автоматаар нуугдана.</li>
+      <li>Таны бичсэн зүйл (хувийн мэдээлэлгүйгээр) чанарыг сайжруулах зорилгоор <strong>30 хоног</strong> хадгалагдана. Хүссэн үедээ «Миний яриаг устгах» дарж устгах боломжтой.</li>
+    </ul>
+    <form method="dialog"><button class="primary" value="ok">Ойлголоо, үргэлжлүүлэх</button></form>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

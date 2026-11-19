@@ -1,0 +1,265 @@
+[
+  {
+    "input": "tolgoi owdood bna",
+    "expected_concepts": [
+      "headache"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "tolgoi ovgood bn",
+    "expected_concepts": [
+      "headache"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "headache болоод байна",
+    "expected_concepts": [
+      "headache"
+    ],
+    "kind": "mixed"
+  },
+  {
+    "input": "тологй өвдөөд байна",
+    "expected_concepts": [
+      "headache"
+    ],
+    "kind": "typo"
+  },
+  {
+    "input": "толгой өвдөж бна",
+    "expected_concepts": [
+      "headache"
+    ],
+    "kind": "informal"
+  },
+  {
+    "input": "haluurch bna",
+    "expected_concepts": [
+      "fever"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "hanialgaad bn",
+    "expected_concepts": [
+      "cough"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "gedes owdood bna",
+    "expected_concepts": [
+      "abdominal_pain"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "dotor muuhairaad bna",
+    "expected_concepts": [
+      "nausea"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "guilgeed bna",
+    "expected_concepts": [
+      "diarrhea"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "nuruu ovdood bn",
+    "expected_concepts": [
+      "back_pain"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "tuuralt garsan",
+    "expected_concepts": [
+      "rash"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "zagatnaad bn",
+    "expected_concepts": [
+      "itching"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "hooloi ovdood bna",
+    "expected_concepts": [
+      "sore_throat"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "цээж өвдөөд байнаа",
+    "expected_concepts": [
+      "chest_pain"
+    ],
+    "kind": "informal"
+  },
+  {
+    "input": "I have a fever",
+    "expected_concepts": [
+      "fever"
+    ],
+    "kind": "english"
+  },
+  {
+    "input": "амьсгал давчиджээ",
+    "expected_concepts": [
+      "dyspnea"
+    ],
+    "kind": "typo"
+  },
+  {
+    "input": "хоолой өвдөөд, нус гоожоод байна",
+    "expected_concepts": [
+      "sore_throat",
+      "runny_nose"
+    ],
+    "kind": "cyrillic"
+  },
+  {
+    "input": "dizzy болоод байна",
+    "expected_concepts": [
+      "dizziness"
+    ],
+    "kind": "mixed"
+  },
+  {
+    "input": "гэдэс өвдөнө, халуурахгүй байна",
+    "expected_concepts": [
+      "abdominal_pain"
+    ],
+    "expected_negated": [
+      "fever"
+    ],
+    "kind": "negation"
+  },
+  {
+    "input": "Маргааш цаг агаар ямар байх вэ",
+    "expected_concepts": [],
+    "expected_absent": [
+      "co_exposure"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Нүдний шил ямар дугаартай авах вэ",
+    "expected_concepts": [],
+    "expected_absent": [
+      "co_exposure"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Агаарын бохирдол хүүхдэд хортой юу",
+    "expected_concepts": [
+      "child"
+    ],
+    "expected_absent": [
+      "co_exposure"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Халуун цай асгаад гар түлэгдсэн",
+    "expected_concepts": [
+      "burn"
+    ],
+    "expected_absent": [
+      "fever"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Өвдөг өвдөөд байна",
+    "expected_concepts": [],
+    "expected_absent": [
+      "headache",
+      "chest_pain"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Эмч рүү очих уу, эмнэлэг хаана байдаг вэ",
+    "expected_concepts": [],
+    "expected_absent": [
+      "medication"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Sugar diabetes гэж юу вэ",
+    "expected_concepts": [
+      "diabetes"
+    ],
+    "kind": "medlineplus"
+  },
+  {
+    "input": "Strep throat болсон бололтой",
+    "expected_concepts": [
+      "sore_throat"
+    ],
+    "kind": "medlineplus"
+  },
+  {
+    "input": "HPV вакцин",
+    "expected_concepts": [
+      "hpv"
+    ],
+    "kind": "mixed"
+  },
+  {
+    "input": "tamhi tatahaa boliyo gej bna",
+    "expected_concepts": [
+      "tobacco"
+    ],
+    "kind": "latin"
+  },
+  {
+    "input": "утаатай өдөр гадаа гарч болох уу",
+    "expected_concepts": [
+      "air_pollution"
+    ],
+    "expected_absent": [
+      "co_exposure"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Найзтайгаа үерхдэг",
+    "expected_concepts": [],
+    "expected_absent": [
+      "disaster"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Сүүлийн үед толгой өвдөөд байна",
+    "expected_concepts": [
+      "headache"
+    ],
+    "expected_absent": [
+      "diarrhea"
+    ],
+    "kind": "false_positive"
+  },
+  {
+    "input": "Сүүлд их ядраад байна",
+    "expected_concepts": [
+      "fatigue"
+    ],
+    "expected_absent": [
+      "diarrhea"
+    ],
+    "kind": "false_positive"
+  }
+]
