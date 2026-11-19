@@ -80,6 +80,7 @@ class NullLLMProvider(LLMProvider):
 
 # Models that support the server-side refusal fallback ("fallbacks": "default")
 _FALLBACK_MODELS = {"claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5", "claude-fable-5-1"}
+_UNUSABLE_STOPS = {"refusal", "max_tokens", "model_context_window_exceeded"}
 
 
 class AnthropicProvider(LLMProvider):
@@ -111,11 +112,19 @@ class AnthropicProvider(LLMProvider):
                 )
             else:
                 resp = self.client.messages.create(**kwargs)
-        except self._anthropic.APIError as e:  # covers status, connection, timeout errors
+        except self._anthropic.APIError as e:  # status, connection, timeout errors
             raise LLMError(f"Anthropic API error: {e}") from e
-        if resp.stop_reason == "refusal":
-            raise LLMError("Model declined the request")
-        text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text").strip()
+        except Exception as e:  # missing credentials raise TypeError / CredentialsError, not APIError
+            raise LLMError(f"Anthropic client error: {type(e).__name__}: {e}") from e
+        if resp.stop_reason in _UNUSABLE_STOPS:
+            # refusal = declined; max_tokens / context exceeded = cut off mid-answer.
+            # A truncated medical answer may drop the warning signs -> never use it.
+            raise LLMError(f"Unusable response (stop_reason={resp.stop_reason})")
+        blocks = list(resp.content)
+        # After a server-side fallback, text written BEFORE the last fallback block
+        # belongs to the model that declined — keep only the final model's text.
+        last_fb = max((i for i, b in enumerate(blocks) if getattr(b, "type", "") == "fallback"), default=-1)
+        text = "".join(b.text for b in blocks[last_fb + 1:] if getattr(b, "type", "") == "text").strip()
         if not text:
             raise LLMError(f"Empty response (stop_reason={resp.stop_reason})")
         return LLMResult(text=text, model=getattr(resp, "model", model), usage=self._usage(resp))
@@ -127,10 +136,10 @@ class AnthropicProvider(LLMProvider):
             )
         except self._anthropic.APIError as e:
             raise LLMError(f"Anthropic API error: {e}") from e
-        except Exception as e:  # validation / parsing problems
-            raise LLMError(f"Structured output failed: {e}") from e
-        if resp.stop_reason == "refusal" or resp.parsed_output is None:
-            raise LLMError("No structured output (refusal or invalid)")
+        except Exception as e:  # credentials, validation / parsing problems
+            raise LLMError(f"Structured output failed: {type(e).__name__}: {e}") from e
+        if resp.stop_reason in _UNUSABLE_STOPS or resp.parsed_output is None:
+            raise LLMError(f"No structured output (stop_reason={resp.stop_reason})")
         return resp.parsed_output, self._usage(resp)
 
 

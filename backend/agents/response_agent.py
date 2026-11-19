@@ -20,9 +20,9 @@ from ..models.schemas import (DraftResponse, NormalizedInput, RetrievalResult, R
                               SafetyIssue, SymptomAnalysis, TriageResult)
 from ..nlp.lexicon import ConceptLexicon
 from ..services.llm import LLMError, LLMProvider, UsageTracker
+from .safety_agent import cited_doc_ids  # one shared citation extractor
 
 DISCLAIMER = "ℹ️ Энэ бол ерөнхий мэдээлэл бөгөөд эмчийн үзлэг, оношийг орлохгүй."
-CITE_RE = re.compile(r"\[(MED_[A-Z0-9_]+)\]")
 
 RISK_LEAD = {
     RiskLevel.LOW: "Одоогийн мэдээллээр яаралтай шинж илрээгүй байна. Гэхдээ доорх тохиолдолд эмчид хандаарай:",
@@ -159,7 +159,7 @@ class ResponseAgent(UsageTracker):
         out.append("📚 **Эх сурвалж**\n" + "\n".join(src))
         out.append(DISCLAIMER)
         text = "\n\n".join(out)
-        return DraftResponse(text=text, cited_doc_ids=sorted(set(CITE_RE.findall(text))), generator="template")
+        return DraftResponse(text=text, cited_doc_ids=sorted(cited_doc_ids(text)), generator="template")
 
     # ------------------------------------------------------------ LLM mode
     def _generate_llm(self, norm, analysis, triage, retrieval, feedback, attempt) -> DraftResponse:
@@ -192,4 +192,4 @@ class ResponseAgent(UsageTracker):
         text = res.text
         if "ℹ️" not in text:
             text += "\n\n" + DISCLAIMER
-        return DraftResponse(text=text, cited_doc_ids=sorted(set(CITE_RE.findall(text))), generator="llm", attempt=attempt)
+        return DraftResponse(text=text, cited_doc_ids=sorted(cited_doc_ids(text)), generator="llm", attempt=attempt)

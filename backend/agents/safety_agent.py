@@ -62,7 +62,13 @@ def _clean_url(u: str) -> str:
     while u.endswith(")") and u.count("(") < u.count(")"):
         u = u[:-1]
     return u
-_CITE = re.compile(r"\[(MED_[A-Z0-9_]+)\]")
+_DOC_ID = re.compile(r"\bMED_[A-Z0-9_]+")
+
+
+def cited_doc_ids(text: str) -> set[str]:
+    """Every knowledge-base id mentioned anywhere — "[A]", "[A, B]" or bare —
+    so a fabricated id cannot hide inside a multi-id bracket."""
+    return set(_DOC_ID.findall(text))
 _PII_ECHO = re.compile(r"(?<!\d)[5-9]\d{3}[\s-]?\d{4}(?!\d)|\b[А-ЯӨҮЁа-яөүё]{2}\d{8}\b")
 _CYR = re.compile(r"[а-яёөү]", re.IGNORECASE)
 _LAT = re.compile(r"[a-z]", re.IGNORECASE)
@@ -95,7 +101,7 @@ class SafetyAgent(UsageTracker):
         def add(code, sev, detail):
             issues.append(SafetyIssue(code=code, severity=sev, detail=detail))
 
-        unknown = sorted(set(_CITE.findall(text)) - allowed_doc_ids)
+        unknown = sorted(cited_doc_ids(text) - allowed_doc_ids)
         if unknown:
             add("FABRICATED_CITATION", "REVISE", f"Cited ids not in retrieved documents: {unknown}")
         bad_urls = [u for u in map(_clean_url, _URL.findall(text)) if u not in allowed_urls]
@@ -142,6 +148,10 @@ class SafetyAgent(UsageTracker):
         issues = self.check_rules(draft.text, risk=triage.risk_level, allowed_doc_ids=allowed_ids,
                                   allowed_urls=allowed_urls, require_sections=require_sections)
         checked = ["rules"]
+        if draft.generator == "llm" and docs and not (cited_doc_ids(draft.text) & allowed_ids):
+            # an LLM answer must be traceable to at least one retrieved document
+            issues.append(SafetyIssue(code="NO_CITATION", severity="REVISE",
+                                      detail="Answer cites none of the retrieved documents"))
         if draft.generator == "llm" and not any(i.severity == "BLOCK" for i in issues):
             judge = self._judge(draft, triage, retrieval, norm)
             checked.append("llm_judge")

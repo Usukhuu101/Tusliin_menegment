@@ -435,7 +435,7 @@ def test_sdk_generate_uses_server_side_fallback_for_opus(provider):
                             model="claude-opus-5-5", effort="medium")
     assert res.text == "сайн" and res.usage == {"input_tokens": 11, "output_tokens": 7}
     req = provider.requests[0]
-    assert req["path"] == "/v1/messages" and req["query"].get("beta") == "true"
+    assert req["path"] == "/v1/messages"     # (SDK 2.x no longer adds a ?beta=true query param)
     assert "server-side-fallback-2026-07-01" in req["headers"]["anthropic-beta"]
     body = req["body"]
     assert body["fallbacks"] == "default" and body["output_config"] == {"effort": "medium"}
