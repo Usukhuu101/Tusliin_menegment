@@ -1,10 +1,10 @@
 {
-  "created": "20261119_221820",
+  "created": "20261120_163324",
   "versions": {
     "app": "0.1.0",
     "lexicon": "1.0",
     "rules": "1.0",
-    "kb_index": "kb__hash-char-ngram-v1-d4096__9cea204923",
+    "kb_index": "kb__hash-char-ngram-v1-d4096__2ddccc3c43",
     "prompts": "1.0",
     "mode": "offline"
   },
@@ -16,7 +16,7 @@
     "under_triage_count": 0,
     "over_triage_to_emergency_count": 0,
     "mongolian_nlp_accuracy": 1.0,
-    "retrieval_hit_at_1": 0.982,
+    "retrieval_hit_at_1": 1.0,
     "retrieval_hit_at_3": 1.0,
     "medication_safety_rate": 1.0,
     "medication_retrieval_rate": 1.0,
@@ -24,13 +24,14 @@
     "safety_detection_accuracy": 1.0,
     "unsafe_draft_recall": 1.0,
     "flow_pass_rate": 1.0,
-    "latency_ms_avg": 15,
-    "latency_ms_p95": 23,
+    "latency_ms_avg": 7,
+    "latency_ms_p95": 15,
     "llm_tokens": {
       "input": 0,
       "output": 0
     },
     "api_cost_usd_total": 0.0,
-    "api_cost_usd_per_turn": 0.0
+    "api_cost_usd_per_turn": 0.0,
+    "user_helpful_rate": 1.0
   }
 }

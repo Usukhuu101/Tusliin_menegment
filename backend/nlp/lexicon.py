@@ -32,7 +32,10 @@ NEG_SUFFIX = "гуи"
 # Tokens starting with these (folded) are never fuzzy-matched.
 #   сүүлийн/сүүлд/сүүлээр ("recently") vs суулгах (diarrhea); агаар (air) vs угаар (CO)
 #   холбоотой ("related to") vs хөлдөх (frostbite) / хөлөө (leg)
-NO_FUZZY_PREFIXES = ("суули", "суулд", "суулэ", "агаар", "дугаар", "халуун", "холбо")
+#   тухай ("about") vs тулай (gout); medical words one letter from a medicine name:
+#   панкреатит / панкреатин, диоксин / дигоксин, колит / колистин, глицерин / глицерон, гастроинтестинал / гастродин
+NO_FUZZY_PREFIXES = ("суули", "суулд", "суулэ", "агаар", "дугаар", "халуун", "холбо", "тухаи",
+                     "панкрэатит", "диоксин", "колит", "глицэрин", "глицэро", "гастроинт")
 # Body-part nouns (folded). In "толгой өвдөөд ГЭДЭС эргээд" the words after "гэдэс"
 # describe the stomach, not the head — so "толгой ... эргэ" (dizziness) must not
 # match across it. A pattern may still skip a body part directly ("гэдэс, толгой өвдөөд").
@@ -51,6 +54,13 @@ class Concept:
     # Safety-critical concepts (e.g. suicidal thoughts) are never "negated away":
     # a false alarm is far cheaper than a missed crisis.
     ignore_negation: bool = False
+    # A typo is forgiven only in stems at least this long. Generated medicine-name
+    # lexicons raise it (file-level "fuzzy_min_len"): "морфин" must not match "морин".
+    fuzzy_min_len: int = 5
+    # A match is ignored when the NEXT word starts with one of these (folded) stems:
+    # "инсулины эсэргүүцэл", "адреналин ихсээд", "фолийн хүчлийн дутагдал" talk about the
+    # body's own substance, not about the medicine (file-level "block_next").
+    block_next: tuple[str, ...] = ()
 
 
 @dataclass
@@ -110,14 +120,14 @@ class ConceptLexicon:
             self._known_cache[token] = any(token.startswith(s) for s in self._known_stems)
         return self._known_cache[token]
 
-    def _stem_match(self, token: str, stem: str) -> bool:
+    def _stem_match(self, token: str, stem: str, fuzzy_min_len: int = 5) -> bool:
         if stem.endswith("$"):
             return token == stem[:-1]
         if token.startswith(stem):
             return True
         # one typo allowed (incl. swapped letters) — only for long stems, same first
         # letter, and only when the token is not already a known lexicon word
-        if (len(stem) >= 5 and len(token) >= len(stem) - 1 and token[0] == stem[0]
+        if (len(stem) >= fuzzy_min_len and len(token) >= len(stem) - 1 and token[0] == stem[0]
                 and not token.startswith(NO_FUZZY_PREFIXES) and not self._is_known_word(token)):
             return _fuzzy_prefix(token, stem)
         return False
@@ -127,10 +137,13 @@ class ConceptLexicon:
         data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         if self.version == "unknown":          # the main lexicon (loaded first) defines the version
             self.version = str(data.get("version", self.version))
+        fuzzy_min_len = int(data.get("fuzzy_min_len", 5))
+        block_next = tuple(fold(s) for s in data.get("block_next") or ())
         for cid, spec in (data.get("concepts") or {}).items():
             c = self.concepts.get(cid) or Concept(
                 id=cid, label_mn=spec.get("label_mn", cid), type=spec.get("type", "symptom"),
-                ignore_negation=bool(spec.get("ignore_negation", False)),
+                ignore_negation=bool(spec.get("ignore_negation", False)), fuzzy_min_len=fuzzy_min_len,
+                block_next=block_next,
             )
             for pat in spec.get("mn", []) or []:
                 c.patterns.append(_compile_pattern(pat))
@@ -161,7 +174,10 @@ class ConceptLexicon:
             best: ConceptMatch | None = None
             for stems in c.patterns:
                 # red flags keep the wide window: a false alarm is cheaper than a miss
-                for start, end in self._find(tokens, stems, clause_bound=c.type != "red_flag"):
+                for start, end in self._find(tokens, stems, clause_bound=c.type != "red_flag",
+                                             fuzzy_min_len=c.fuzzy_min_len):
+                    if c.block_next and end + 1 < len(tokens) and tokens[end + 1].startswith(c.block_next):
+                        continue
                     neg = False if c.ignore_negation else self._is_negated(tokens, end, stems[-1])
                     m = ConceptMatch(c.id, c.label_mn, c.type, neg, start, end)
                     # a positive mention wins over a negated one
@@ -180,13 +196,13 @@ class ConceptLexicon:
                 found[c.id] = best
         return list(found.values())
 
-    def _find(self, tokens: list[str], stems: list[str], clause_bound: bool = False):
+    def _find(self, tokens: list[str], stems: list[str], clause_bound: bool = False, fuzzy_min_len: int = 5):
         for i, tok in enumerate(tokens):
-            if not self._stem_match(tok, stems[0]):
+            if not self._stem_match(tok, stems[0], fuzzy_min_len):
                 continue
             pos, ok = i, True
             for stem in stems[1:]:
-                nxt = self._next_stem(tokens, pos, stem, clause_bound)
+                nxt = self._next_stem(tokens, pos, stem, clause_bound, fuzzy_min_len)
                 if nxt is None:
                     ok = False
                     break
@@ -194,10 +210,10 @@ class ConceptLexicon:
             if ok:
                 yield i, pos
 
-    def _next_stem(self, tokens: list[str], pos: int, stem: str, clause_bound: bool):
+    def _next_stem(self, tokens: list[str], pos: int, stem: str, clause_bound: bool, fuzzy_min_len: int = 5):
         skipped_other = False
         for j in range(pos + 1, min(len(tokens), pos + 1 + WINDOW)):
-            if self._stem_match(tokens[j], stem):
+            if self._stem_match(tokens[j], stem, fuzzy_min_len):
                 return j
             is_body = tokens[j].startswith(BODY_PARTS)
             if clause_bound and is_body and skipped_other:

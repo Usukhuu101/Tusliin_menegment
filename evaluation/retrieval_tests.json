@@ -243,5 +243,12 @@
   {"query": "астма гэж юу вэ", "expected_docs": ["MED_DIS_009"]},
   {"query": "цус багадалт гэж юу вэ", "expected_docs": ["MED_DIS_010"]},
   {"query": "жин хасах арга", "expected_docs": ["MED_NUT_001"]},
-  {"query": "зөв хооллох зөвлөгөө", "expected_docs": ["MED_NUT_001"]}
+  {"query": "зөв хооллох зөвлөгөө", "expected_docs": ["MED_NUT_001"]},
+  {"query": "ибупрофен жороор олгодог уу", "expected_docs": ["MED_EML_019"]},
+  {"query": "метформин", "expected_docs": ["MED_EML_367"]},
+  {"query": "paracetamol", "expected_docs": ["MED_EML_024"]},
+  {"query": "омепразол ямар эм вэ", "expected_docs": ["MED_EML_328"]},
+  {"query": "сальбутамол ингалятор", "expected_docs": ["MED_EML_480"]},
+  {"query": "аспирин жоргүй авч болох уу", "expected_docs": ["MED_EML_272"]},
+  {"query": "улаанбурхны вакцин", "expected_docs": ["MED_EML_396", "MED_EML_397"]}
 ]

@@ -100,3 +100,13 @@ def test_pii_redaction():
     text, kinds = redact_pii("Миний утас 99112233, РД УБ99112233, mail a@b.mn")
     assert "99112233" not in text and "a@b.mn" not in text
     assert set(kinds) >= {"phone", "national_id", "email"}
+
+
+def test_name_redaction_needs_a_name_phrase():
+    assert redact_pii("Намайг Бат гэдэг")[0] == "Намайг [НЭР] гэдэг"
+    assert redact_pii("Миний нэр Сараа")[0] == "Миний нэр [НЭР]"
+    assert redact_pii("Намайг санаж байна уу")[0] == "Намайг санаж байна уу"     # "remember me?" keeps its verb
+
+
+def test_tukhai_about_is_not_gout(processor):
+    assert "joint_pain" not in concepts(processor, "Миний тухай юу санаж байна")       # тухай != тулай

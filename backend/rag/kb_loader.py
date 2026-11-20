@@ -45,6 +45,10 @@ class KBDocMeta(BaseModel):
     title: str
     category: Literal["symptom", "disease", "emergency", "first_aid", "medication", "prevention", "nutrition"]
     concepts: list[str] = Field(default_factory=list)
+    # "concept": retrieved ONLY when the query names one of the document's concepts
+    # (e.g. one-per-medicine list entries — "Сүрьеэ гэж юу вэ" must not get an anti-TB
+    # drug's entry just because its group is called "Сүрьеэ эмчлэх эм").
+    retrieval: Literal["hybrid", "concept"] = "hybrid"
     source: str
     source_tier: int = Field(ge=1, le=3)
     source_url: str

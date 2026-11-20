@@ -91,6 +91,7 @@ details.agents .adetail { color: var(--muted); overflow-wrap: anywhere; }
 .feedback button:hover { border-color: var(--brand); }
 .feedback select, .feedback input { font: inherit; font-size: 13px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--text); max-width: 100%; }
 .typing .bubble { color: var(--muted); }
+.restored { text-align: center; color: var(--muted); font-size: 13px; margin: 6px 0 14px; }
 .dots::after { content: "…"; animation: blink 1s steps(3) infinite; }
 @keyframes blink { 50% { opacity: .3; } }
 

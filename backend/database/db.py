@@ -121,6 +121,15 @@ class Database:
             )
             return int(cur.lastrowid)
 
+    def get_turns(self, session_id: str, limit: int = 100) -> list[dict]:
+        """The chat so far (redacted user text + reply), oldest first — to redraw it after a page reload."""
+        with self._conn() as c:
+            rows = c.execute(
+                "SELECT turn_id, user_text_redacted, reply, message_type, risk_level FROM turns "
+                "WHERE session_id=? ORDER BY turn_id DESC LIMIT ?", (session_id, limit)).fetchall()
+        return [{"turn_id": r["turn_id"], "user": r["user_text_redacted"], "reply": r["reply"],
+                 "message_type": r["message_type"], "risk_level": r["risk_level"]} for r in reversed(rows)]
+
     def turn_belongs_to(self, turn_id: int, session_id: str) -> bool:
         with self._conn() as c:
             row = c.execute("SELECT 1 FROM turns WHERE turn_id=? AND session_id=?", (turn_id, session_id)).fetchone()

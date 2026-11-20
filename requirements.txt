@@ -8,9 +8,10 @@ numpy>=1.26
 # --- LLM (optional: only used when ANTHROPIC_API_KEY is set; Gemini / OpenAI-compatible need no extra package) ---
 anthropic>=2.0
 
-# --- data scripts (scripts/build_adr_summaries.py) ---
+# --- data scripts (scripts/build_adr_summaries.py, scripts/eml_mn_pdf_to_csv.py) ---
 pandas>=2.0
 openpyxl>=3.1
+# pdfplumber>=0.11   # only to re-convert the Essential Medicines List PDF (the app never imports it)
 
 # --- tests ---
 pytest>=8.0

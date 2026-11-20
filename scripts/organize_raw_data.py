@@ -39,12 +39,14 @@ RULES: list[tuple[str, str, str]] = [
     ("who_mongolia_health_data", "who", "WHO Mongolia news articles, full text (7 articles, Oct-Nov 2026, English)"),
     ("who_mongolia_markdown", "who", "WHO Mongolia news articles, cleaned summaries (same 7 articles)"),
     ("medlineplus", "medlineplus", "MedlinePlus health-topic synonyms / cross-references (English)"),
+    ("neml", "essential_medicines", "Essential Medicines List IX (MOH order А/625, 2020-12-25), PDF"),
 ]
 SOURCES = {
     "regulatory_mmra": "MMRA (MN-MMRA ids)",
     "statistics": "Health statistics (to be confirmed)",
     "who": "WHO Mongolia (who.int/mongolia)",
     "medlineplus": "MedlinePlus, U.S. National Library of Medicine (medlineplus.gov)",
+    "essential_medicines": "Ministry of Health of Mongolia, via WHO national EML repository (cdn.who.int)",
 }
 
 

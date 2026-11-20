@@ -4,7 +4,9 @@
   const chat = $("chat"), form = $("form"), input = $("input"), send = $("send");
   const RISK = { LOW: "Бага эрсдэл", MODERATE: "Дунд эрсдэл", HIGH: "Өндөр эрсдэл", EMERGENCY: "ЯАРАЛТАЙ" };
   const KIND = { ANSWER: "Хариулт", FOLLOWUP: "Тодруулах асуулт", EMERGENCY: "Яаралтай", FALLBACK: "Мэдээлэл хангалтгүй",
-                 GREETING: "", THANKS: "", OUT_OF_SCOPE: "Хамрах хүрээнээс гадуур", CLARIFY: "Тодруулах" };
+                 GREETING: "", THANKS: "", OUT_OF_SCOPE: "Хамрах хүрээнээс гадуур", CLARIFY: "Тодруулах",
+                 RECALL: "Санах ой", NOTED: "Тэмдэглэв" };
+  const NO_RISK = ["GREETING", "THANKS", "OUT_OF_SCOPE", "RECALL", "NOTED"];
   const REASONS = [["incorrect", "Буруу мэдээлэл"], ["not_relevant", "Хамааралгүй"],
                    ["did_not_understand", "Асуултыг ойлгоогүй"], ["not_enough", "Мэдээлэл хангалтгүй"], ["other", "Бусад"]];
 
@@ -75,7 +77,7 @@
   function addBot(r) {
     const el = document.createElement("div");
     el.className = `msg bot ${r.message_type}`;
-    const showRisk = !["GREETING", "THANKS", "OUT_OF_SCOPE"].includes(r.message_type);
+    const showRisk = !NO_RISK.includes(r.message_type);
     let html = `<div class="bubble">`;
     if (showRisk || KIND[r.message_type]) {
       html += `<div class="meta">${showRisk ? `<span class="badge ${r.risk_level}">${RISK[r.risk_level]}</span>` : ""}`
@@ -170,6 +172,26 @@
     await fetch(`/api/session/${encodeURIComponent(sessionId)}`, { method: "DELETE" });
     store.del("hc_session"); sessionId = null; location.reload();
   });
+
+  // ---------- restore this chat after a page reload (the server remembers it) ----------
+  async function restoreHistory() {
+    if (!sessionId) return;
+    try {
+      const res = await fetch(`/api/session/${encodeURIComponent(sessionId)}/history`);
+      if (!res.ok) return;
+      const { turns } = await res.json();
+      if (!turns?.length) return;
+      for (const t of turns) {
+        addUser(t.user);
+        addBot({ reply: t.reply, message_type: t.message_type, risk_level: t.risk_level, turn_id: t.turn_id, sources: [] });
+      }
+      const note = document.createElement("div");
+      note.className = "restored";
+      note.textContent = "↩️ Өмнөх яриа сэргээгдлээ — таны хэлсэн мэдээллийг санаж байна. «＋ Шинэ яриа» дарвал шинээр эхэлнэ.";
+      chat.appendChild(note); scroll();
+    } catch {}
+  }
+  restoreHistory();
 
   fetch("/api/health").then((r) => r.json()).then((h) => {
     $("mode").textContent = h.mode.startsWith("llm") ? "🤖 LLM горим" : "📘 Офлайн горим (дүрэм + мэдлэгийн сан)";

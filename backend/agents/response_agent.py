@@ -20,9 +20,12 @@ from ..models.schemas import (DraftResponse, NormalizedInput, RetrievalResult, R
                               SafetyIssue, SymptomAnalysis, TriageResult)
 from ..nlp.lexicon import ConceptLexicon
 from ..services.llm import LLMError, LLMProvider, UsageTracker
+from ..services.memory import MEDICINE_PREFIXES, MemoryContext
 from .safety_agent import cited_doc_ids  # one shared citation extractor
 
 DISCLAIMER = "ℹ️ Энэ бол ерөнхий мэдээлэл бөгөөд эмчийн үзлэг, оношийг орлохгүй."
+_INPUT_TAG = re.compile(r"\s*\[(?:conversation_memory|user_message|transliterated|symptom_analysis|triage|"
+                        r"retrieved_documents|safety_feedback)\]")
 
 RISK_LEAD = {
     RiskLevel.LOW: "Одоогийн мэдээллээр яаралтай шинж илрээгүй байна. Гэхдээ доорх тохиолдолд эмчид хандаарай:",
@@ -71,14 +74,14 @@ class ResponseAgent(UsageTracker):
     # ------------------------------------------------------------- public
     def generate(self, *, norm: NormalizedInput, analysis: SymptomAnalysis, triage: TriageResult,
                  retrieval: RetrievalResult, feedback: Optional[list[SafetyIssue]] = None,
-                 attempt: int = 1, use_llm: bool = True) -> DraftResponse:
+                 attempt: int = 1, use_llm: bool = True, memory: Optional[MemoryContext] = None) -> DraftResponse:
         self.last_usage = []
         if use_llm and self.llm.available:
             try:
-                return self._generate_llm(norm, analysis, triage, retrieval, feedback, attempt)
+                return self._generate_llm(norm, analysis, triage, retrieval, feedback, attempt, memory)
             except LLMError:
                 pass  # fall through to the deterministic answer
-        return self.compose_template(norm=norm, analysis=analysis, triage=triage, retrieval=retrieval)
+        return self.compose_template(norm=norm, analysis=analysis, triage=triage, retrieval=retrieval, memory=memory)
 
     # ------------------------------------------------------- template mode
     def _summary_lines(self, norm: NormalizedInput, analysis: SymptomAnalysis) -> list[str]:
@@ -105,19 +108,23 @@ class ResponseAgent(UsageTracker):
         return lines
 
     def compose_template(self, *, norm: NormalizedInput, analysis: SymptomAnalysis, triage: TriageResult,
-                         retrieval: RetrievalResult) -> DraftResponse:
+                         retrieval: RetrievalResult, memory: Optional[MemoryContext] = None) -> DraftResponse:
         docs: list[RetrievedDoc] = retrieval.docs
         d1 = docs[0]
         d2 = docs[1] if len(docs) > 1 else None
         cite1, cite2 = f"[{d1.doc_id}]", (f"[{d2.doc_id}]" if d2 else "")
         out: list[str] = []
+        about_medicine = analysis.intent == "medication" or any(c.startswith(MEDICINE_PREFIXES) for c in analysis.concepts)
 
         # 🩺
         summary = self._summary_lines(norm, analysis) if analysis.symptoms else []
+        shown = "\n".join(summary)          # age / context already listed there are not repeated
+        earlier = [p for p in (memory.profile if memory else []) if p not in shown]
+        remembered = f"- 🧠 Энэ ярианд өмнө хэлсэн: {', '.join(earlier)}" if earlier else ""
         if summary:
-            out.append("🩺 **Таны хэлсэн шинж**\n" + "\n".join(summary))
+            out.append("🩺 **Таны хэлсэн шинж**\n" + "\n".join(summary + ([remembered] if remembered else [])))
         else:
-            out.append(f"🩺 **Таны асуулт**\n- «{norm.display_text[:160]}»")
+            out.append(f"🩺 **Таны асуулт**\n- «{norm.display_text[:160]}»" + (f"\n{remembered}" if remembered else ""))
 
         # 🔎
         info = [_paragraph(d1.section("Ерөнхий мэдээлэл"), 520) + f" {cite1}"]
@@ -135,6 +142,9 @@ class ResponseAgent(UsageTracker):
         if analysis.intent == "medication":
             head += ("\n💊 Эмийн нэр, тун, хэрэглэх хугацааны талаар би зөвлөгөө өгөх боломжгүй — "
                      "**эмчлэгч эмч эсвэл эм зүйчээсээ** заавал асуугаарай.")
+        if about_medicine and memory and memory.cautions:
+            head += (f"\n🧠 Та энэ ярианд өмнө **{', '.join(memory.cautions)}** гэж хэлсэн — эм авахдаа үүнийгээ "
+                     "эмч, эм зүйчдээ заавал хэлж, танд тохирох эсэхийг асуугаарай.")
         out.append(head + "\n" + "\n".join(care) + f" {cite1}{(' ' + cite2) if d2 else ''}")
 
         # ⚠️
@@ -162,7 +172,7 @@ class ResponseAgent(UsageTracker):
         return DraftResponse(text=text, cited_doc_ids=sorted(cited_doc_ids(text)), generator="template")
 
     # ------------------------------------------------------------ LLM mode
-    def _generate_llm(self, norm, analysis, triage, retrieval, feedback, attempt) -> DraftResponse:
+    def _generate_llm(self, norm, analysis, triage, retrieval, feedback, attempt, memory=None) -> DraftResponse:
         docs_xml = "\n".join(
             f'<document id="{d.doc_id}" title="{d.title}" source="{d.source}" tier="{d.source_tier}" url="{d.source_url}">\n'
             + "\n".join(f"## {s.title}\n{s.text}" for s in d.sections)
@@ -184,12 +194,15 @@ class ResponseAgent(UsageTracker):
             f"recommended_action: {triage.recommended_action}\n</triage>\n"
             f"<retrieved_documents>\n{docs_xml}\n</retrieved_documents>"
         )
+        if memory:
+            user += f"\n<conversation_memory>\n{memory.prompt_block()}\n</conversation_memory>"
         if feedback:
             user += "\n<safety_feedback>\n" + "\n".join(f"- {i.code}: {i.detail}" for i in feedback) + "\n</safety_feedback>"
         res = self.llm.generate(system=self.system_prompt, messages=[{"role": "user", "content": user}],
                                 model=self.model, effort=self.effort)
         self.last_usage.append({"agent": "response", "model": res.model, "attempt": attempt, **res.usage})
-        text = res.text
+        # the model sometimes "cites" the input blocks ("[conversation_memory]") — drop those tags
+        text = _INPUT_TAG.sub("", res.text)
         if "ℹ️" not in text:
             text += "\n\n" + DISCLAIMER
         return DraftResponse(text=text, cited_doc_ids=sorted(cited_doc_ids(text)), generator="llm", attempt=attempt)

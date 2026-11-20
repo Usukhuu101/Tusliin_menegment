@@ -67,24 +67,26 @@ backend/
   agents/        triage_agent.py, symptom_agent.py, rag_agent.py, response_agent.py, safety_agent.py
   nlp/           text_utils.py (fold, транслит), lexicon.py, input_processor.py
   rag/           kb_loader.py, embeddings.py, index.py, indexer.py (CLI)
-  services/      orchestrator.py (агентуудыг холбогч), llm.py (LLM provider abstraction)
+  services/      orchestrator.py (агентуудыг холбогч), llm.py (LLM provider abstraction),
+                 memory.py (ярианы санах ой)
   database/      db.py (SQLite: session, turn, feedback, knowledge_gaps)
   api/           routes.py (FastAPI)
   prompts/       system_response.md, symptom_extraction.md, safety_judge.md
   main.py, config.py
 frontend/        index.html, style.css, app.js (чат UI)
 data/
-  raw/           анхны файлууд (өөрчлөхгүй) + manifest.csv (md5, давхардал)
-  cleaned/       adr_records.csv, adr_summary_by_drug.json (хувийн мэдээлэлгүй)
+  raw/           анхны файлууд (өөрчлөхгүй) + manifest.csv (md5, давхардал);
+                 essential_medicines/mongolia_neml_2020.pdf (ЗШЭ IX жагсаалт)
+  cleaned/       adr_records.csv, adr_summary_by_drug.json (хувийн мэдээлэлгүй), eml_mn_2020.csv
   validated/     хянагдсан өгөгдөл
   knowledge_base/ symptoms/ diseases/ emergency/ first_aid/ medications/ prevention/ nutrition/
   rules/         red_flags.yaml, emergency_templates.yaml       ← ЭМЧ ХЯНАХ
   protocols/     symptom_protocols.yaml (тодруулах асуултууд)   ← ЭМЧ ХЯНАХ
-  nlp/           concept_lexicon.yaml (+ generated_drug_lexicon.yaml)
+  nlp/           concept_lexicon.yaml (+ generated_drug_lexicon.yaml, generated_eml_lexicon.yaml)
   metadata/      kb_registry.json (автоматаар), CHANGELOG.md
 evaluation/      *_tests.json, run_eval.py, baseline.json
-tests/           pytest (153 тест)
-scripts/         organize_raw_data.py, build_adr_summaries.py, report.py
+tests/           pytest (255 тест)
+scripts/         organize_raw_data.py, build_adr_summaries.py, eml_mn_pdf_to_csv.py, build_eml_kb.py, report.py
 ```
 
 ---
@@ -114,18 +116,33 @@ python scripts/build_adr_summaries.py    # 999 давхардалгүй тохи
 python -m backend.rag.indexer
 ```
 
+### Зайлшгүй шаардлагатай эмийн жагсаалт (ЗШЭ) шинэчлэх
+Эх сурвалж: Эрүүл мэндийн сайдын 2020 оны А/625 тушаал — ЗШЭ IX жагсаалт (WHO-ийн улсын ЗШЭ сангаас татсан PDF).
+Эм тус бүрд 1 баримт (`MED_EML_###`, 488 ш): аль бүлэгт багтдаг, нийтийн эмийн санд **жороор/жоргүй** олгох эсэх
+(ЖГ / Ж / Ж* / СЖ / МЖ), хэлбэр (шахмал, сироп, тарилга…), насны анхааруулга, эмнэлгийн шатлал.
+**Тун хэмжээг санаатайгаар оруулаагүй** (чатбот тун хэлэхгүй). Эдгээр баримт `retrieval: concept` — зөвхөн
+хэрэглэгч эмийн нэрийг дурдсан үед л гарна («Сүрьеэ гэж юу вэ» → сүрьеэгийн эмийн баримт биш, шударга fallback).
+```bash
+pip install pdfplumber                      # зөвхөн PDF-ийг дахин хөрвүүлэхэд
+python scripts/eml_mn_pdf_to_csv.py         # PDF -> data/cleaned/eml_mn_2020.csv (703 мөр)
+python scripts/build_eml_kb.py              # CSV -> 488 баримт + generated_eml_lexicon.yaml
+python -m backend.rag.indexer
+```
+2023 оны шинэчилсэн жагсаалтын PDF нь зураг (скан) тул ашиглаагүй. dhealth.gov.mn-ийн эмийн сан бот-ыг
+хаадаг (HTTP 403), «бүх эрх хуулиар хамгаалагдсан» тул ЭМЯ/ЭМХТ-өөс зөвшөөрөл эсвэл CSV/API авалгүйгээр оруулаагүй.
+
 ---
 
 ## 5. Үнэлгээ ба тест
 
 ```bash
-python -m pytest -q                       # 153 unit/API тест
+python -m pytest -q                       # 255 unit/API тест
 python evaluation/run_eval.py             # бүх хэмжүүр + baseline-тай харьцуулах
 python evaluation/run_eval.py --with-llm  # LLM замыг шалгах (мөнгө зарцуулна)
 python evaluation/run_eval.py --update-baseline
 python scripts/report.py                  # мэдлэгийн цоорхой, 👎 санал (долоо хоног бүр)
 ```
-Одоогийн үр дүн (офлайн, 61 баримт): яаралтай байдлыг илрүүлэх **100%**, эрсдэлийн нарийвчлал 100%,
+Одоогийн үр дүн (офлайн, 549 баримт): яаралтай байдлыг илрүүлэх **100%**, эрсдэлийн нарийвчлал 100%,
 монгол NLP 100%, хайлт hit@3 100%, мэдэгдээгүй сэдэвт зохиохгүй байх 100%, аюулгүй байдлын шалгалт 100%.
 ⚠️ Эдгээр тестийг систем бүтээх явцад бичсэн тул **хэт өөдрөг**. Багийн гишүүд, эмч тусдаа (харж байгаагүй) тест бичих хэрэгтэй.
 
@@ -134,6 +151,11 @@ python scripts/report.py                  # мэдлэгийн цоорхой, �
 ## 6. Нууцлал
 - Бүртгэлгүй, санамсаргүй session id. Утас, РД, имэйл, нэр **автоматаар нуугдана**; зөвхөн нуусан текст хадгална.
 - `RETENTION_DAYS` (30) хоногоос хуучин өгөгдөл эхлэх үед устна. «Миний яриаг устгах» → `DELETE /api/session/{id}`.
+- **Ярианы санах ой:** нэг ярианы дотор хэрэглэгчийн хэлсэн нас, жирэмслэлт, хүүхэд, архаг өвчин, харшил, асуусан эм,
+  сүүлийн 10 мессежийг (зөвхөн нуусан текстээр) session-д хадгална. Хариултад «🧠 Энэ ярианд өмнө хэлсэн: …» гэж харуулж,
+  эмийн асуултад эмч/эм зүйчдээ хэлэхийг сануулна; «тэр эм» гэвэл өмнө асуусан эмийг ойлгоно; «Миний тухай юу санаж
+  байна?» гэвэл жагсааж харуулна. Хуудсыг дахин ачаалахад яриа сэргэнэ (`GET /api/session/{id}/history`).
+  Санах ой эрсдэлийг хэзээ ч бууруулахгүй. «＋ Шинэ яриа» эсвэл «Миний яриаг устгах» дарвал мартна.
 - LLM горимд Claude API руу зөвхөн нуусан текст илгээгдэнэ. Embedding бүрэн локал.
 - Хэрэглэгчийн санал **хэзээ ч автоматаар** мэдлэгийн санд орохгүй.
 - Хүний хувийн мэдээлэл хамгаалах тухай хуулийн дагуу эрүүл мэндийн мэдээлэл нь эмзэг мэдээлэл — production-д HTTPS, нэвтрэх эрх, шифрлэлт заавал.
@@ -162,7 +184,8 @@ docker compose up --build        # http://localhost:8000 ; build үед аюул
 ---
 
 ## 9. Мэдэгдэж буй хязгаарлалт
-- Мэдлэгийн сан 46 гараар бичсэн + 15 автомат баримт; AI-аар бичсэн, **эмч хянаагүй**.
+- Мэдлэгийн сан 46 гараар бичсэн + 15 ADR + 488 ЗШЭ автомат баримт; **эмч, эм зүйч хянаагүй**.
+- ЗШЭ жагсаалт 2020 оных; эмийн нэрийг англиар (amoxicillin, ceftriaxone) бичвэл зарим нь танигдахгүй.
 - Офлайн embedding нь утгын бус, үсгийн төстэй байдалд суурилсан — ойлголтын толь (lexicon) нөхдөг.
   Илүү сайн хайлтад `EMBEDDING_PROVIDER=sentence-transformers` (BAAI/bge-m3).
 - Сэтгэцийн эрүүл мэндийн тусламжийн утасны дугаарыг ЭМЯ-аас баталгаажуулж `emergency_templates.yaml`-д нэмэх.

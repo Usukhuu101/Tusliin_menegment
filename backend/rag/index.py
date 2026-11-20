@@ -102,7 +102,7 @@ class KBIndex:
             d = self.docs[doc_id]
             dcon = set(d["concepts"])
             overlap = len(dcon & qset)
-            if overlap == 0 and b["rrf"] == 0:
+            if overlap == 0 and (b["rrf"] == 0 or d.get("retrieval") == "concept"):
                 continue
             concept_score = overlap / len(qset) if qset else 0.0
             concept_score -= 0.15 * len((dcon & CONTEXT_CONCEPTS) - qset)   # e.g. child doc for an adult question
@@ -136,7 +136,8 @@ def build_index(docs: list[KBDocument], provider: EmbeddingProvider, statuses: t
     for d in docs:
         m = d.meta
         doc_map[m.id] = {
-            "title": m.title, "category": m.category, "concepts": m.concepts, "source": m.source,
+            "title": m.title, "category": m.category, "concepts": m.concepts, "retrieval": m.retrieval,
+            "source": m.source,
             "source_url": m.source_url, "source_tier": m.source_tier, "status": m.status,
             "version": m.version, "sections": d.sections, "path": str(d.path), "hash": d.content_hash,
         }

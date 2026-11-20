@@ -140,7 +140,7 @@ class SafetyAgent(UsageTracker):
 
     # ------------------------------------------------------------- review
     def review(self, draft: DraftResponse, *, triage: TriageResult, retrieval: RetrievalResult | None,
-               norm: NormalizedInput, require_sections: bool = True) -> SafetyVerdict:
+               norm: NormalizedInput, require_sections: bool = True, memory: str = "") -> SafetyVerdict:
         self.last_usage = []
         docs = retrieval.docs if retrieval else []
         allowed_ids = {d.doc_id for d in docs}
@@ -153,7 +153,7 @@ class SafetyAgent(UsageTracker):
             issues.append(SafetyIssue(code="NO_CITATION", severity="REVISE",
                                       detail="Answer cites none of the retrieved documents"))
         if draft.generator == "llm" and not any(i.severity == "BLOCK" for i in issues):
-            judge = self._judge(draft, triage, retrieval, norm)
+            judge = self._judge(draft, triage, retrieval, norm, memory)
             checked.append("llm_judge")
             if judge is None:
                 issues.append(SafetyIssue(code="JUDGE_UNAVAILABLE", severity="REVISE",
@@ -172,7 +172,7 @@ class SafetyAgent(UsageTracker):
             verdict = "SAFE"
         return SafetyVerdict(verdict=verdict, issues=issues, checked_by=checked)
 
-    def _judge(self, draft, triage, retrieval, norm) -> JudgeOutput | None:
+    def _judge(self, draft, triage, retrieval, norm, memory: str = "") -> JudgeOutput | None:
         if not self.llm.available:
             return None
         docs = "\n".join(
@@ -183,7 +183,8 @@ class SafetyAgent(UsageTracker):
             f"<user_message>{norm.redacted}</user_message>\n"
             f"<triage_risk>{triage.risk_level.value}</triage_risk>\n"
             f"<retrieved_documents>\n{docs}\n</retrieved_documents>\n"
-            f"<draft_answer>\n{draft.text}\n</draft_answer>"
+            + (f"<conversation_memory>\n{memory}\n</conversation_memory>\n" if memory else "")
+            + f"<draft_answer>\n{draft.text}\n</draft_answer>"
         )
         try:
             out, usage = self.llm.generate_structured(system=self.prompt, messages=[{"role": "user", "content": user}],

@@ -37,7 +37,8 @@ def raise_one_level(level: RiskLevel, cap: RiskLevel = RiskLevel.HIGH) -> RiskLe
     return nxt if risk_rank(nxt) <= risk_rank(cap) else level
 
 
-MessageType = Literal["ANSWER", "FOLLOWUP", "EMERGENCY", "FALLBACK", "GREETING", "OUT_OF_SCOPE", "CLARIFY", "THANKS"]
+MessageType = Literal["ANSWER", "FOLLOWUP", "EMERGENCY", "FALLBACK", "GREETING", "OUT_OF_SCOPE", "CLARIFY", "THANKS",
+                      "RECALL", "NOTED"]
 Intent = Literal["symptom_check", "medication", "general_info", "greeting", "thanks", "out_of_scope", "unclear"]
 
 
@@ -177,8 +178,26 @@ class SafetyVerdict(BaseModel):
 
 
 # --------------------------------------------------------------- session
+class HistoryItem(BaseModel):
+    user: str                                  # redacted (PII masked), Cyrillic display text
+    reply_type: str
+    topics: list[str] = Field(default_factory=list)   # concept labels
+
+
+class ConversationMemory(BaseModel):
+    """What the user told the bot EARLIER IN THIS CHAT (see backend/services/memory.py).
+    Survives topic changes, server restarts and page reloads; deleted with the session."""
+    contexts: list[str] = Field(default_factory=list)     # concept ids: pregnancy, child, elderly ...
+    conditions: list[str] = Field(default_factory=list)   # diseases the user said they HAVE (not asked about)
+    symptoms: list[str] = Field(default_factory=list)
+    medicines: list[str] = Field(default_factory=list)    # specific medicines, most recent last
+    allergies: list[str] = Field(default_factory=list)    # user's own words: "пенициллинд харшилтай"
+    history: list[HistoryItem] = Field(default_factory=list)
+
+
 class SessionState(BaseModel):
     session_id: str
+    memory: ConversationMemory = Field(default_factory=ConversationMemory)
     turn_count: int = 0
     concepts: list[str] = Field(default_factory=list)
     negated_concepts: list[str] = Field(default_factory=list)

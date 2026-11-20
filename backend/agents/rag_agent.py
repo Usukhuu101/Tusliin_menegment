@@ -14,6 +14,10 @@ from ..nlp.lexicon import ConceptLexicon
 from ..rag.index import KBIndex
 
 NON_TOPIC_TYPES = {"modifier"}          # "маш хүчтэй", "гэнэт" are not topics
+# Concepts that name ONE specific medicine (ADR summaries, essential-medicines list).
+# A document about a different medicine than the one asked about is never useful:
+# "Ибупрофен жороор олгодог уу" must not get the cefotaxime side-effect summary.
+SPECIFIC_MEDICINE_PREFIXES = ("drug_", "eml_")
 
 
 def build_query(display_text: str, concepts: list[str], lexicon: ConceptLexicon) -> tuple[str, list[str]]:
@@ -29,10 +33,15 @@ class RAGAgent:
         self.cosine_threshold = cosine_threshold
         self.max_docs = max_docs
 
+    def _about_other_medicine(self, doc_id: str, query_concepts: list[str]) -> bool:
+        specific = {c for c in self.index.docs[doc_id]["concepts"] if c.startswith(SPECIFIC_MEDICINE_PREFIXES)}
+        return bool(specific) and not specific & set(query_concepts)
+
     def retrieve(self, analysis: SymptomAnalysis, norm: NormalizedInput) -> RetrievalResult:
         text, concepts = build_query(norm.display_text, analysis.concepts, self.lexicon)
         prefer = "medication" if analysis.intent == "medication" else None
-        ranked = self.index.search(text, concepts, prefer_category=prefer)
+        ranked = [r for r in self.index.search(text, concepts, prefer_category=prefer)
+                  if not self._about_other_medicine(r.doc_id, concepts)]
         result = RetrievalResult(query=text, query_concepts=concepts, index_name=self.index.name)
         if not ranked:
             result.reason = "no candidates"

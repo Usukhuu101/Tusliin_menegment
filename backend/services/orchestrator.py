@@ -37,6 +37,7 @@ from ..nlp.input_processor import InputProcessor
 from ..nlp.lexicon import ConceptLexicon
 from ..rag.embeddings import get_embedding_provider
 from ..rag.indexer import ensure_index, lexicon_paths
+from . import memory as mem
 from .llm import get_llm_provider
 
 log = logging.getLogger(__name__)
@@ -156,10 +157,15 @@ class ChatOrchestrator:
             "redacted": norm.redacted, "display": norm.display_text, "script": norm.script, "pii": norm.pii_types,
             "concepts": [c.model_dump() for c in norm.concepts], "facts": norm.facts.model_dump(exclude_none=True),
         }
+        # "Тэр эмийн гаж нөлөө?" -> the medicine asked about earlier in this chat
+        referenced = mem.referenced_medicine(norm, session)
+        was_pending = bool(session.pending_slots)
         parts = [f"бичиг: {norm.script}"]
         if norm.script in ("latin", "mixed"):
             parts.append(f"кирилл: «{norm.display_text[:60]}»")
         parts.append(f"ойлголт: {self._labels(norm.positive_concepts)}")
+        if referenced:
+            parts.append(f"санах ой: «тэр эм» = {self.lexicon.label(referenced)}")
         if norm.negated_concepts:
             parts.append(f"үгүйсгэсэн: {self._labels(norm.negated_concepts)}")
         if norm.pii_types:
@@ -168,8 +174,11 @@ class ChatOrchestrator:
 
         current_symptoms = [c for c in norm.positive_concepts if self.lexicon.type_of(c) in SYMPTOM_TYPES]
         current_topics = [c for c in norm.positive_concepts if self.lexicon.type_of(c) in TOPIC_TYPES]
-        if any(c not in session.concepts for c in current_topics) and session.last_message_type in ("ANSWER", "FALLBACK"):
+        topics_with_ref = current_topics + ([referenced] if referenced else [])
+        if any(c not in session.concepts for c in topics_with_ref) and session.last_message_type in ("ANSWER", "FALLBACK"):
             self._start_new_topic(session)
+        if referenced and referenced not in session.concepts:
+            session.concepts.append(referenced)
 
         # ---- Agent 1, pass 1 (rules only, current message)
         t = time.perf_counter()
@@ -203,6 +212,20 @@ class ChatOrchestrator:
         if tri.risk_level == RiskLevel.EMERGENCY:
             self._skip(trace, ["rag"], "Яаралтай — шууд 103 загвар руу шилжив")
             return self._emergency(tri, norm, session, trace, analysis, t0, usage)
+
+        # ---- conversation memory: "what did I tell you?" / "I am 28 and pregnant" (nothing to look up)
+        if not current_topics and mem.is_recall_question(norm):
+            self._skip(trace, ["rag", "response", "safety"], "Санах ой — энэ ярианд өмнө хэлсэн мэдээллийг харууллаа")
+            return self._finish(mem.recall_text(session, self.lexicon), "RECALL", tri, norm, session, analysis,
+                                trace, t0, usage)
+        if (not current_topics and not was_pending and analysis.intent not in ("greeting", "thanks")
+                and mem.is_self_description(norm, self.lexicon)):
+            preview = session.model_copy(deep=True)
+            preview.facts = analysis.facts
+            mem.remember(preview, norm, self.lexicon, "NOTED")
+            self._skip(trace, ["rag", "response", "safety"], "Хэрэглэгчийн өөрийн тухай мэдээллийг санах ойд хадгаллаа")
+            return self._finish(mem.noted_text(preview, norm, self.lexicon), "NOTED", tri, norm, session, analysis,
+                                trace, t0, usage)
 
         # ---- simple intents
         if analysis.intent in ("greeting", "thanks", "out_of_scope"):
@@ -252,7 +275,8 @@ class ChatOrchestrator:
             return self._finish(self._fallback_text(tri), "FALLBACK", tri, norm, session, analysis, trace, t0, usage)
 
         # ---- Agents 4 + 5
-        draft = self._answer_with_safety(norm, analysis, tri, retrieval, trace, usage)
+        draft = self._answer_with_safety(norm, analysis, tri, retrieval, trace, usage,
+                                         mem.build_context(session, norm, self.lexicon))
         if draft is None:
             return self._finish(self._fallback_text(tri), "FALLBACK", tri, norm, session, analysis, trace, t0, usage)
         return self._finish(draft.text, "ANSWER", tri, norm, session, analysis, trace, t0, usage, retrieval=retrieval)
@@ -289,14 +313,16 @@ class ChatOrchestrator:
 
     # ================================================================ helpers
     def _answer_with_safety(self, norm: NormalizedInput, analysis: SymptomAnalysis, tri: TriageResult,
-                            retrieval: RetrievalResult, trace: TurnTrace, usage: list[dict]) -> Optional[DraftResponse]:
+                            retrieval: RetrievalResult, trace: TurnTrace, usage: list[dict],
+                            memory: Optional[mem.MemoryContext] = None) -> Optional[DraftResponse]:
         t = time.perf_counter()
-        draft = self.response.generate(norm=norm, analysis=analysis, triage=tri, retrieval=retrieval)
+        memory_block = memory.prompt_block() if memory else ""
+        draft = self.response.generate(norm=norm, analysis=analysis, triage=tri, retrieval=retrieval, memory=memory)
         usage += self.response.last_usage
         self._step(trace, "response", self._draft_detail(draft), t)
         for attempt in range(self.s.max_regenerations + 1):
             t = time.perf_counter()
-            verdict = self.safety.review(draft, triage=tri, retrieval=retrieval, norm=norm)
+            verdict = self.safety.review(draft, triage=tri, retrieval=retrieval, norm=norm, memory=memory_block)
             usage += self.safety.last_usage
             trace.drafts.append({"generator": draft.generator, "attempt": draft.attempt, "chars": len(draft.text),
                                  "cited": draft.cited_doc_ids})
@@ -310,15 +336,16 @@ class ChatOrchestrator:
                     and attempt < self.s.max_regenerations:
                 t = time.perf_counter()
                 draft = self.response.generate(norm=norm, analysis=analysis, triage=tri, retrieval=retrieval,
-                                               feedback=verdict.issues, attempt=attempt + 2)
+                                               feedback=verdict.issues, attempt=attempt + 2, memory=memory)
                 usage += self.response.last_usage
                 self._step(trace, "response", "Дахин бичив (аюулгүй байдлын санал) — " + self._draft_detail(draft), t)
                 continue
             break
         if draft.generator == "llm":   # never release an unsafe LLM draft -> deterministic answer
             t = time.perf_counter()
-            draft = self.response.compose_template(norm=norm, analysis=analysis, triage=tri, retrieval=retrieval)
-            verdict = self.safety.review(draft, triage=tri, retrieval=retrieval, norm=norm)
+            draft = self.response.compose_template(norm=norm, analysis=analysis, triage=tri, retrieval=retrieval,
+                                                   memory=memory)
+            verdict = self.safety.review(draft, triage=tri, retrieval=retrieval, norm=norm, memory=memory_block)
             trace.drafts.append({"generator": "template", "attempt": "fallback", "chars": len(draft.text)})
             trace.safety.append(verdict.model_dump())
             self._step(trace, "safety", "LLM ноорог татгалзсан → хянагдсан KB загвар: " + self._verdict_detail(verdict),
@@ -370,6 +397,7 @@ class ChatOrchestrator:
             session.facts = session.facts.merged_with(norm.facts)
         if mtype != "FOLLOWUP":
             session.pending_slots = []
+        mem.remember(session, norm, self.lexicon, mtype)
         session.turn_count += 1
         session.max_risk = max_risk(session.max_risk, tri.risk_level)
         session.last_message_type = mtype

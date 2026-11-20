@@ -29,6 +29,7 @@ from ..services.llm import LLMError, LLMProvider, UsageTracker
 log = logging.getLogger(__name__)
 
 SYMPTOM_TYPES = {"symptom", "red_flag"}
+LLM_HIDDEN_PREFIXES = ("eml_",)
 _GREETING = re.compile(r"^\s*(саин|сн\s*уу|мэнд|hello|hi\b|hey\b|good (morning|evening))")
 _THANKS = re.compile(r"баярлалаа|баярлаа|баярлала|thanks|thank you|thx")
 _QUESTION = re.compile(r"гэж\s*ю|юу\s*вэ|\bю\s*вэ|яаж|хэрхэн|шалтгаан|сэргиил|эмчилгээ|юунаас|аюултаи\s*юу|халдвартаи|what is|how (to|do)|why")
@@ -204,7 +205,10 @@ class SymptomAgent(UsageTracker):
 
     # --------------------------------------------------------------- LLM
     def _llm_enrich(self, norm: NormalizedInput, analysis: SymptomAnalysis) -> None:
-        allowed = "\n".join(f"- {c.id}: {c.label_mn} ({c.type})" for c in self.lexicon.concepts.values())
+        # Medicine names from the essential-medicines list (500+) are left out: the lexicon
+        # already finds them, and listing them would multiply the prompt size of every call.
+        allowed = "\n".join(f"- {c.id}: {c.label_mn} ({c.type})" for c in self.lexicon.concepts.values()
+                            if not c.id.startswith(LLM_HIDDEN_PREFIXES))
         user = (
             f"<allowed_concepts>\n{allowed}\n</allowed_concepts>\n"
             f"<user_message>\n{norm.redacted}\n</user_message>\n"
