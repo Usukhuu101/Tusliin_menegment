@@ -224,5 +224,24 @@
     "expected_docs": [
       "MED_PRV_005"
     ]
-  }
+  },
+  {"query": "шүд өвдөөд байна", "expected_docs": ["MED_SYM_013"]},
+  {"query": "shud ovdood bna", "expected_docs": ["MED_SYM_013"]},
+  {"query": "чих өвдөөд байна", "expected_docs": ["MED_SYM_014"]},
+  {"query": "нүд улайгаад загатнаад байна", "expected_docs": ["MED_SYM_015"]},
+  {"query": "нойр хүрэхгүй байна", "expected_docs": ["MED_SYM_016"]},
+  {"query": "өтгөн хатаад байна", "expected_docs": ["MED_SYM_017"]},
+  {"query": "гэдэс дүүрээд байна", "expected_docs": ["MED_SYM_017"]},
+  {"query": "шээх үед хорсоод байна", "expected_docs": ["MED_SYM_018"]},
+  {"query": "бөөр өвдөөд байна", "expected_docs": ["MED_SYM_018"]},
+  {"query": "үе мөч өвдөөд байна", "expected_docs": ["MED_SYM_019"]},
+  {"query": "хөл хавдаад байна", "expected_docs": ["MED_SYM_020"]},
+  {"query": "сарын тэмдгийн үеэр гэдэс өвддөг", "expected_docs": ["MED_SYM_021", "MED_SYM_006"]},
+  {"query": "батга гараад байна", "expected_docs": ["MED_SYM_022"]},
+  {"query": "чихрийн шижин гэж юу вэ", "expected_docs": ["MED_DIS_007"]},
+  {"query": "ковид гэж юу вэ", "expected_docs": ["MED_DIS_008"]},
+  {"query": "астма гэж юу вэ", "expected_docs": ["MED_DIS_009"]},
+  {"query": "цус багадалт гэж юу вэ", "expected_docs": ["MED_DIS_010"]},
+  {"query": "жин хасах арга", "expected_docs": ["MED_NUT_001"]},
+  {"query": "зөв хооллох зөвлөгөө", "expected_docs": ["MED_NUT_001"]}
 ]

@@ -22,6 +22,22 @@ def test_fold_and_transliteration():
     assert transliterate_latin("bna") == "байна"
 
 
+@pytest.mark.parametrize("latin,cyrillic", [
+    ("shvd", "шүд"), ("hvvhed", "хүүхэд"), ("tvlegdsen", "түлэгдсэн"), ("vzeh", "үзэх"),   # v = ү
+    ("davchdaad", "давчдаад"), ("ovchin", "овчин"), ("kovid", "ковид"), ("vitamin", "витамин"),  # v = в
+])
+def test_latin_v_is_ue_or_ve(latin, cyrillic):
+    assert transliterate_latin(latin) == cyrillic
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("shvd owdood bna", "toothache"), ("hvvhed maani haluurlaa", "fever"), ("hvvhed maani haluurlaa", "child"),
+    ("amisgal davchdaad bn", "dyspnea"), ("noir hurehgui bn", "insomnia"), ("otgon hataad bn", "constipation"),
+])
+def test_latin_chat_script(processor, text, expected):
+    assert expected in concepts(processor, text)
+
+
 def test_swap_counts_as_one_typo():
     assert levenshtein("тологи", "толгои") == 1
 
@@ -40,9 +56,31 @@ def test_crisis_language_is_never_negated(processor):
     ("Маргааш цаг агаар ямар байх вэ", "co_exposure"),      # агаар (air) != угаар (CO)
     ("Халуун цай асгаад түлэгдсэн", "fever"),               # халуун (hot) != халуурах (fever)
     ("Эмч рүү очих уу", "medication"),                      # эмч (doctor) != эм (medicine)
+    ("Толгой өвдөөд гэдэс эргээд байна", "dizziness"),       # "эргэх" belongs to гэдэс, not толгой
+    ("Чихрийн шижинтэй хүний хөл өвдөх", "ear_pain"),       # чихрийн (sugar) != чих (ear)
+    ("chihriin shijintei hunii hol ovdoh", "ear_pain"),
+    ("Хорт хавдартай холбоотой юу", "frostbite"),            # холбоотой (related) != хөлдөх
+    ("Хорт хавдартай холбоотой юу", "leg_swelling"),
+    ("Толгой үе үе өвддөг", "joint_pain"),                   # үе үе (sometimes) != үе мөч (joints)
+    ("Шээх үед өвдөөд байна", "joint_pain"),                 # үед (at the time) != үе (joint)
+    ("Витамин Д хэрэгтэй юу", "drug_010"),                   # "витамин" alone is not vitamin B complex
 ])
 def test_no_false_positive(processor, text, absent):
     assert absent not in concepts(processor, text)
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("Шүд өвдөөд байна", "toothache"), ("shud ovdood bna", "toothache"), ("Чих шуугиад өвдөөд байна", "ear_pain"),
+    ("Нүд улайгаад загатнаад байна", "eye_problem"), ("Нойр хүрэхгүй байна", "insomnia"),
+    ("Өтгөн хатаад байна", "constipation"), ("Гэдэс дүүрээд байна", "bloating"),
+    ("Шээх үед хорсоод байна", "urinary_symptoms"), ("Бөөр өвдөөд байна", "kidney_pain"),
+    ("Үе мөч өвдөөд байна", "joint_pain"), ("Хөл хавдаад байна", "leg_swelling"),
+    ("Сарын тэмдэг ирэхэд өвддөг", "menstrual_pain"), ("Батга гараад байна", "acne"),
+    ("Ковид гэж юу вэ", "covid19"), ("Астма гэж юу вэ", "asthma"), ("Цус багадалт гэж юу вэ", "anemia"),
+    ("Жин хасах арга", "healthy_diet"), ("Чихрийн шижин гэж юу вэ", "diabetes"),
+])
+def test_new_topics_are_recognised(processor, text, expected):
+    assert expected in concepts(processor, text)
 
 
 def test_facts(processor):

@@ -506,3 +506,119 @@ concepts:
     mn: ["гаж нөлөө", "эмэнд харшил", "эмийн харшил", "эм уусны дараа", "эм уугаад", "тариа хийлгэсний дараа", "тариа хийлгээд"]
     latin: ["gaj noloo", "gaj nuluu"]
     en: ["side effect", "adverse reaction", "drug allergy"]
+
+  # ------------------------------------------- added 2026-11-19 (KB expansion)
+  # Each concept below has its own KB document. Short stems that are also
+  # everyday words use "$" (exact word): "чих$" must not match "чихрийн шижин",
+  # "үе$" must not match "үед" (= "at the time of").
+  toothache:
+    label_mn: шүд өвдөх
+    type: symptom
+    mn: ["шүд өвд", "шүд хөндүүр", "шүд шархир", "шүд янгин", "шүд цоор", "шүд хорхой", "шүдний өвчин", "буйл хавд", "буйл өвд", "буйл цус", "буйл үрэвс"]
+    latin: ["shud ovd", "shud owd", "shuud ovd", "shud uvd"]
+    en: ["toothache", "tooth pain", "tooth ache", "gum pain"]
+
+  ear_pain:
+    label_mn: чих өвдөх
+    type: symptom
+    mn: ["чих$ өвд", "чихний өвд", "чихэнд өвд", "чихээр өвд", "чих$ хатг", "чихэнд хатг", "чих$ битүүр", "чих$ бөглөр", "чих$ гоож", "чихнээс идээ", "чихнээс шингэн", "чихнээс гоож", "чихний үрэвсэл", "дунд чихний"]
+    latin: ["chih$ ovd", "chikh$ ovd", "chih$ owd"]
+    en: ["earache", "ear ache", "ear pain", "ear infection"]
+
+  eye_problem:
+    label_mn: нүд улайх, загатнах, өвдөх
+    type: symptom
+    mn: ["нүд улай", "нүд загатн", "нүд өвд", "нүд хорс", "нүд нулимс", "нүд идээ", "нүд хавд", "нүд хуурай", "нүд хатг", "нүдний салст", "нүдний үрэвсэл", "нүд үрэвс"]
+    latin: ["nud ulai", "nud zagatn", "nud ovd", "nud owd"]
+    en: ["red eye", "red eyes", "pink eye", "conjunctivitis", "eye pain", "itchy eyes", "sore eyes"]
+
+  insomnia:
+    label_mn: нойргүйдэх, нойр хүрэхгүй байх
+    type: symptom
+    mn: ["нойргүй", "нойр хүрэхгүй", "нойр хүрдэггүй", "нойр муу", "нойр сэрэмтгий", "нойр алд", "нойр хулжи", "унтаж чадахгүй", "унтаж чаддаггүй", "унтаж чадаагүй", "унтаж өгөхгүй", "шөнө сэрээд унтаж"]
+    latin: ["noirgui", "noir hurehgui", "untaj chadahgui"]
+    en: ["insomnia", "can't sleep", "cannot sleep", "trouble sleeping", "sleepless"]
+
+  constipation:
+    label_mn: өтгөн хатах
+    type: symptom
+    mn: ["өтгөн хата", "өтгөн хату", "өтгөн гарахгүй", "өтгөн гардаггүй", "баас хата", "баас хату", "баас гарахгүй", "гэдэс хата", "бие засаж чадахгүй", "хаталт"]
+    latin: ["otgon hat", "utgun hat", "gedes hat"]
+    en: ["constipation", "constipated"]
+
+  bloating:
+    label_mn: гэдэс дүүрэх, гэдэс эргэх
+    type: symptom
+    mn: ["гэдэс дүүр", "гэдэс эрг", "гэдэс түгж", "гэдэс пүрд", "гэдэс бургил"]
+    latin: ["gedes duur", "gedes erg"]
+    en: ["bloating", "bloated", "flatulence"]
+
+  urinary_symptoms:
+    label_mn: шээх үед хорсох, ойр ойрхон шээх
+    type: symptom
+    mn: ["шээ хорс", "шээ өвд", "шээ хатг", "ойр ойрхон шээ", "байнга шээ", "шээс ойр", "шээс булингар", "шээс цустай", "цустай шээс", "шээсний зам", "давсаг"]
+    latin: ["sheehed hors", "shees hors", "sheeh ued hors"]
+    en: ["uti", "urinary tract infection", "burning urination", "painful urination", "cystitis"]
+
+  kidney_pain:
+    label_mn: бөөр орчмоор өвдөх
+    type: symptom
+    mn: ["бөөр өвд", "бөөр орчим", "бөөр хатг", "бөөр шархир", "бөөрний үрэвсэл", "бөөр үрэвс", "бөөрний чулуу", "бөөрөө өвд"]
+    latin: ["boor ovd", "buur ovd", "boor owd"]
+    en: ["kidney pain", "flank pain", "kidney infection", "kidney stone"]
+
+  joint_pain:
+    label_mn: үе мөч өвдөх
+    type: symptom
+    mn: ["үе$ мөч", "үений", "үе$ хавд", "үе$ үрэвс", "үе$ хөш", "өвдөг$", "өвдг", "тохой өвд", "бугуй өвд", "шагай өвд", "ташаа өвд", "мөр$ өвд", "мөрөө өвд", "артрит", "тулай", "хэрх$", "хэрх өвчин"]
+    latin: ["uye$ moch", "uye$ much", "ovdog$ ovd"]
+    en: ["joint pain", "joints hurt", "arthritis", "knee pain", "gout"]
+
+  leg_swelling:
+    label_mn: хөл, шагай хавагнах
+    type: symptom
+    mn: ["хөл$ хавд", "хөл$ хаван", "хөлөө хавд", "хөлний хаван", "хөл$ хавагн", "хөл гар хавд", "шагай хавд", "шагай хаван", "хаван суу", "хавантай", "хавагнаад", "хавагнах"]
+    latin: ["hol$ havd", "khol$ khavd", "hol$ havagn"]
+    en: ["swollen legs", "leg swelling", "swollen ankles", "swollen feet", "edema", "oedema"]
+
+  menstrual_pain:
+    label_mn: сарын тэмдэг, сарын тэмдгийн үеийн өвдөлт
+    type: symptom
+    mn: ["сарын тэмдэг", "сарын тэмдг", "сарын юм ир", "тэмдэг ирэ", "сарын тэмдгийн өвд"]
+    latin: ["sariin temdeg", "sarin temdeg"]
+    en: ["period pain", "period cramps", "menstrual pain", "menstrual cramps", "dysmenorrhea", "menstruation"]
+
+  acne:
+    label_mn: батга
+    type: condition
+    mn: ["батга", "нүүр батга", "үрэвссэн батга"]
+    latin: ["batga"]
+    en: ["acne", "pimple", "pimples"]
+
+  covid19:
+    label_mn: коронавируст халдвар (КОВИД-19)
+    type: condition
+    mn: ["ковид", "коронавирус", "корона вирус", "корона$"]
+    latin: ["kovid", "korona"]
+    en: ["covid", "covid-19", "covid19", "coronavirus", "sars-cov-2"]
+
+  asthma:
+    label_mn: астма (багтраа)
+    type: condition
+    mn: ["астма", "багтраа", "гуурсан хоолойн багтраа", "амьсгал багтр"]
+    latin: ["astma", "bagtraa"]
+    en: ["asthma", "asthmatic", "wheezing"]
+
+  anemia:
+    label_mn: цус багадалт
+    type: condition
+    mn: ["цус багад", "цус багата", "төмөр дутагд", "төмрийн дутагд", "гемоглобин", "анеми"]
+    latin: ["tsus bagad", "anemi"]
+    en: ["anemia", "anaemia", "iron deficiency", "low iron"]
+
+  healthy_diet:
+    label_mn: зөв хооллолт, эрүүл жин
+    type: condition
+    mn: ["зөв хоолл", "зөв хоол", "эрүүл хоол", "хооллолт", "хоолны дэглэм", "хоол тэжээл", "жин хас", "жингээ хас", "жин нэмэгд", "жин ихс", "илүүдэл жин", "эрүүл жин", "биеийн жин", "таргал", "тарган", "турах арга", "юу идэх", "юу идвэл"]
+    latin: ["jin$ has", "zuv hool", "eruul hool"]
+    en: ["healthy diet", "healthy eating", "nutrition", "weight loss", "lose weight", "obesity", "overweight"]

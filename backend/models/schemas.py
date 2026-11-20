@@ -188,6 +188,17 @@ class SessionState(BaseModel):
     followup_rounds: int = 0
     max_risk: RiskLevel = RiskLevel.LOW
     last_message_type: Optional[str] = None
+    # Concepts / facts of EARLIER, already-answered topics. Not used for retrieval
+    # or follow-ups, but Agent 1 (triage) still sees them: "цээж өвдөж байна" ->
+    # answer -> "амьсгал давчдаж байна" must still be an EMERGENCY.
+    background_concepts: list[str] = Field(default_factory=list)
+    background_facts: Facts = Field(default_factory=Facts)
+
+    def triage_concepts(self, concepts: list[str]) -> list[str]:
+        return list(dict.fromkeys(self.background_concepts + concepts))
+
+    def triage_facts(self, facts: "Facts") -> "Facts":
+        return self.background_facts.merged_with(facts)
 
 
 # ------------------------------------------------------------------- API

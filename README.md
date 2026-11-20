@@ -20,13 +20,18 @@ python run.py
 
 API түлхүүргүйгээр **офлайн горимд** бүрэн ажиллана (дүрэм + хайлт + хянагдсан текст).
 
-### LLM (Claude) горим асаах — заавал биш
+### LLM горим асаах — заавал биш
 ```bash
 copy .env.example .env        # Windows  (Mac/Linux: cp)
-# .env дотор:  ANTHROPIC_API_KEY=sk-ant-...
+# .env дотор аль нэгийг нь:
+#   GEMINI_API_KEY=...          ҮНЭГҮЙ — https://aistudio.google.com/apikey (Flash-Lite, өдрийн хязгаартай)
+#   ANTHROPIC_API_KEY=sk-ant-...  төлбөртэй — Claude
 python run.py
 ```
-Дэлгэцийн баруун дээд буланд «🤖 LLM горим» гарна. LLM алдаа гарвал систем автоматаар офлайн горимд шилжинэ.
+Дэлгэцийн баруун дээд буланд «🤖 LLM горим» гарна. LLM алдаа гарвал (хязгаар хэтрэх, сүлжээ тасрах) систем
+автоматаар офлайн горимд шилжинэ. Groq, OpenRouter, локал Ollama зэрэг OpenAI-compatible API-г
+`LLM_PROVIDER=openai_compat` + `LLM_BASE_URL` + `LLM_MODEL`-оор холбоно (`.env.example`-ийг харна уу).
+⚠️ Gemini-ийн үнэгүй түвшинд Google мессежийг (хувийн мэдээллийг нуусан ч) бүтээгдэхүүнээ сайжруулахад ашиглаж болно.
 
 ---
 
@@ -78,7 +83,7 @@ data/
   nlp/           concept_lexicon.yaml (+ generated_drug_lexicon.yaml)
   metadata/      kb_registry.json (автоматаар), CHANGELOG.md
 evaluation/      *_tests.json, run_eval.py, baseline.json
-tests/           pytest (70 тест)
+tests/           pytest (153 тест)
 scripts/         organize_raw_data.py, build_adr_summaries.py, report.py
 ```
 
@@ -114,13 +119,13 @@ python -m backend.rag.indexer
 ## 5. Үнэлгээ ба тест
 
 ```bash
-python -m pytest -q                       # 70 unit/API тест
+python -m pytest -q                       # 153 unit/API тест
 python evaluation/run_eval.py             # бүх хэмжүүр + baseline-тай харьцуулах
 python evaluation/run_eval.py --with-llm  # LLM замыг шалгах (мөнгө зарцуулна)
 python evaluation/run_eval.py --update-baseline
 python scripts/report.py                  # мэдлэгийн цоорхой, 👎 санал (долоо хоног бүр)
 ```
-Одоогийн үр дүн (офлайн, 41 баримт): яаралтай байдлыг илрүүлэх **100%**, эрсдэлийн нарийвчлал 100%,
+Одоогийн үр дүн (офлайн, 61 баримт): яаралтай байдлыг илрүүлэх **100%**, эрсдэлийн нарийвчлал 100%,
 монгол NLP 100%, хайлт hit@3 100%, мэдэгдээгүй сэдэвт зохиохгүй байх 100%, аюулгүй байдлын шалгалт 100%.
 ⚠️ Эдгээр тестийг систем бүтээх явцад бичсэн тул **хэт өөдрөг**. Багийн гишүүд, эмч тусдаа (харж байгаагүй) тест бичих хэрэгтэй.
 
@@ -152,12 +157,12 @@ docker compose up --build        # http://localhost:8000 ; build үед аюул
 | Монгол үсэг `????` гэж гарна (Windows терминал) | `set PYTHONIOENCODING=utf-8` |
 | Бүх хариулт «мэдээлэл хангалтгүй» | `APP_ENV=production` үед ACTIVE баримт алга → эмч хянаж ACTIVE болгох эсвэл `development` |
 | `Index ... was built with ...` | Embedding солигдсон → `python -m backend.rag.indexer --force` |
-| LLM горим асахгүй | `.env` дэх `ANTHROPIC_API_KEY`, `pip install anthropic`; `/api/health` → `mode` |
+| LLM горим асахгүй | `.env` дэх `GEMINI_API_KEY` эсвэл `ANTHROPIC_API_KEY` (+ `pip install anthropic`); `/api/health` → `mode` |
 
 ---
 
 ## 9. Мэдэгдэж буй хязгаарлалт
-- Мэдлэгийн сан 26 гараар бичсэн + 15 автомат баримт; AI-аар бичсэн, **эмч хянаагүй**.
+- Мэдлэгийн сан 46 гараар бичсэн + 15 автомат баримт; AI-аар бичсэн, **эмч хянаагүй**.
 - Офлайн embedding нь утгын бус, үсгийн төстэй байдалд суурилсан — ойлголтын толь (lexicon) нөхдөг.
   Илүү сайн хайлтад `EMBEDDING_PROVIDER=sentence-transformers` (BAAI/bge-m3).
 - Сэтгэцийн эрүүл мэндийн тусламжийн утасны дугаарыг ЭМЯ-аас баталгаажуулж `emergency_templates.yaml`-д нэмэх.
