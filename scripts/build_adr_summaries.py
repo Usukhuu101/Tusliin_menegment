@@ -48,6 +48,8 @@ HEADER_KEYS = {
     "date": lambda h: "ирүүлсэн огноо" in h,
 }
 _LAT2CYR_SKIP = re.compile(r"[a-z]", re.I)
+# A drug CLASS word is not a drug name: users who write only "витамин" may mean any vitamin.
+GENERIC_DRUG_WORDS = {"витамин", "vitamin", "вакцин", "vaccine", "антибиотик", "antibiotic", "тариа", "эм"}
 
 
 def norm_header(v) -> str:
@@ -254,6 +256,7 @@ def main() -> None:
     for i, (key, v) in enumerate(top, 1):
         cid = f"drug_{i:03d}"
         names = {key} | {re.split(r"[,(/]", n)[0].strip().lower() for n in v["names"]}
+        names -= GENERIC_DRUG_WORDS     # "витамин" alone would also catch "витамин Д" -> wrong document
         lex["concepts"][cid] = {"label_mn": v["display_name"], "type": "medication",
                                 "mn": sorted(n for n in names if n and len(n) > 3 and not _LAT2CYR_SKIP.search(n)),
                                 "en": sorted(n for n in names if n and len(n) > 3 and _LAT2CYR_SKIP.search(n))}

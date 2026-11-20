@@ -26,11 +26,11 @@ from typing import Optional
 from ..agents.rag_agent import RAGAgent
 from ..agents.response_agent import DISCLAIMER, RISK_LEAD, ResponseAgent
 from ..agents.safety_agent import SafetyAgent
-from ..agents.symptom_agent import SYMPTOM_TYPES, SymptomAgent
+from ..agents.symptom_agent import SYMPTOM_TYPES, SymptomAgent, mentions_health_topic
 from ..agents.triage_agent import TriageAgent
 from ..config import Settings
 from ..database.db import Database
-from ..models.schemas import (AgentStep, ChatResponse, DraftResponse, NormalizedInput, RetrievalResult, RiskLevel,
+from ..models.schemas import (AgentStep, ChatResponse, DraftResponse, Facts, NormalizedInput, RetrievalResult, RiskLevel,
                               SafetyVerdict, SessionState, SourceOut, SymptomAnalysis, TriageResult, TurnTrace,
                               max_risk, risk_rank)
 from ..nlp.input_processor import InputProcessor
@@ -42,6 +42,8 @@ from .llm import get_llm_provider
 log = logging.getLogger(__name__)
 APP_VERSION = "0.1.0"
 _SESSION_RE = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
+TOPIC_TYPES = {"symptom", "red_flag", "condition", "medication"}   # what a user asks ABOUT
+CARRY_OVER_TYPES = {"red_flag", "context", "exposure"}             # kept when the topic changes
 
 TITLES = {
     "input": "Оролт боловсруулагч",
@@ -119,6 +121,26 @@ class ChatOrchestrator:
     def _labels(self, concepts: list[str]) -> str:
         return ", ".join(self.lexicon.label(c) for c in concepts) or "—"
 
+    def _start_new_topic(self, session: SessionState) -> None:
+        """The previous question was answered and the user now raises a NEW topic.
+        Forget the old complaint (its symptoms, duration, severity ...) so that
+        "гэдэс өвдөөд байна" after a headache answer is not read as "headache +
+        stomach ache". Who the patient is (age, child, pregnancy), what they were
+        exposed to and any red flag stay in focus.
+        SAFETY: nothing is lost for triage — the old topic moves to `background_*`,
+        which Agent 1 still evaluates, so cross-turn combinations (chest pain now,
+        breathlessness later) still trigger the emergency rules exactly as before."""
+        keep = [c for c in session.concepts if self.lexicon.type_of(c) in CARRY_OVER_TYPES]
+        dropped = [c for c in session.concepts if c not in keep]
+        session.background_concepts = list(dict.fromkeys(session.background_concepts + dropped))
+        session.background_facts = session.background_facts.merged_with(session.facts)
+        session.concepts = keep
+        session.negated_concepts = []
+        old = session.facts
+        session.facts = Facts(age_years=old.age_years, age_months=old.age_months, sex=old.sex)
+        session.followup_rounds = 0          # a new complaint starts a new clarification round
+        session.asked_slots = []
+
     # ================================================================ turn
     def handle(self, message: str, session_id: Optional[str] = None) -> ChatResponse:
         t0 = time.perf_counter()
@@ -145,13 +167,14 @@ class ChatOrchestrator:
         self._step(trace, "input", "; ".join(parts), t)
 
         current_symptoms = [c for c in norm.positive_concepts if self.lexicon.type_of(c) in SYMPTOM_TYPES]
-        if any(c not in session.concepts for c in current_symptoms) and session.last_message_type == "ANSWER":
-            session.followup_rounds = 0          # a new complaint starts a new clarification round
-            session.asked_slots = []
+        current_topics = [c for c in norm.positive_concepts if self.lexicon.type_of(c) in TOPIC_TYPES]
+        if any(c not in session.concepts for c in current_topics) and session.last_message_type in ("ANSWER", "FALLBACK"):
+            self._start_new_topic(session)
 
         # ---- Agent 1, pass 1 (rules only, current message)
         t = time.perf_counter()
-        tri1 = self.triage.assess(norm.positive_concepts, session.facts.merged_with(norm.facts), bool(current_symptoms))
+        tri1 = self.triage.assess(norm.positive_concepts, session.triage_facts(session.facts.merged_with(norm.facts)),
+                                  bool(current_symptoms))
         trace.triage_rules = tri1.model_dump()
         self._step(trace, "triage", self._triage_detail(tri1), t,
                    "alert" if tri1.risk_level == RiskLevel.EMERGENCY else "ok")
@@ -168,8 +191,10 @@ class ChatOrchestrator:
 
         # ---- Agent 1, pass 2 (session-merged + LLM signal; LLM can only raise)
         t = time.perf_counter()
+        tri_concepts = session.triage_concepts(analysis.concepts + analysis.llm_red_flags)
         tri = self.triage.assess(
-            analysis.concepts + analysis.llm_red_flags, analysis.facts, bool(analysis.symptoms),
+            tri_concepts, session.triage_facts(analysis.facts),
+            any(self.lexicon.type_of(c) in SYMPTOM_TYPES for c in tri_concepts),
             llm_risk=analysis.llm_risk, llm_flags=[self.lexicon.label(c) for c in analysis.llm_red_flags],
         )
         trace.triage_final = tri.model_dump()
@@ -220,7 +245,9 @@ class ChatOrchestrator:
             self.db.add_knowledge_gap(session_id=sid, query=norm.redacted, concepts=retrieval.query_concepts,
                                       top_score=retrieval.top_score, reason=retrieval.reason)
             self._skip(trace, ["response"], "Найдвартай мэдээлэл алга — зохиохгүй, аюулгүй хариу + цоорхойн бүртгэл")
-            if analysis.intent == "unclear" and not analysis.concepts:
+            # "Шүд өвдөөд байна" is perfectly clear — we just have no document for it.
+            # Only a genuinely vague message gets "please describe it more".
+            if analysis.intent == "unclear" and not analysis.concepts and not mentions_health_topic(norm):
                 return self._finish(CLARIFY, "CLARIFY", tri, norm, session, analysis, trace, t0, usage)
             return self._finish(self._fallback_text(tri), "FALLBACK", tri, norm, session, analysis, trace, t0, usage)
 
@@ -301,7 +328,8 @@ class ChatOrchestrator:
         return None
 
     def _draft_detail(self, d: DraftResponse) -> str:
-        how = f"LLM ({self.s.response_model})" if d.generator == "llm" else "хянагдсан KB текстээс угсарсан (офлайн)"
+        how = (f"LLM ({self.llm.model_for(self.s.response_model)})" if d.generator == "llm"
+               else "хянагдсан KB текстээс угсарсан (офлайн)")
         return f"{how}; иш татсан: {', '.join(d.cited_doc_ids) or '—'}; {len(d.text)} тэмдэгт"
 
     def _fallback_text(self, tri: TriageResult) -> str:

@@ -31,7 +31,13 @@ NEG_SUFFIX = "гуи"
 # Frequent NON-medical words that are one letter away from a medical stem.
 # Tokens starting with these (folded) are never fuzzy-matched.
 #   сүүлийн/сүүлд/сүүлээр ("recently") vs суулгах (diarrhea); агаар (air) vs угаар (CO)
-NO_FUZZY_PREFIXES = ("суули", "суулд", "суулэ", "агаар", "дугаар", "халуун")
+#   холбоотой ("related to") vs хөлдөх (frostbite) / хөлөө (leg)
+NO_FUZZY_PREFIXES = ("суули", "суулд", "суулэ", "агаар", "дугаар", "халуун", "холбо")
+# Body-part nouns (folded). In "толгой өвдөөд ГЭДЭС эргээд" the words after "гэдэс"
+# describe the stomach, not the head — so "толгой ... эргэ" (dizziness) must not
+# match across it. A pattern may still skip a body part directly ("гэдэс, толгой өвдөөд").
+BODY_PARTS = ("толгои", "гэдэс", "цээж", "хоолои", "нуруу", "зурх", "хузуу", "нуур", "хэвли", "ходоод",
+              "шуд", "нуд", "хамар", "хамр", "уушг", "элэг", "боор", "чих")
 _LATIN_RE = re.compile(r"[a-z]")
 
 
@@ -154,7 +160,8 @@ class ConceptLexicon:
         for c in self.concepts.values():
             best: ConceptMatch | None = None
             for stems in c.patterns:
-                for start, end in self._find(tokens, stems):
+                # red flags keep the wide window: a false alarm is cheaper than a miss
+                for start, end in self._find(tokens, stems, clause_bound=c.type != "red_flag"):
                     neg = False if c.ignore_negation else self._is_negated(tokens, end, stems[-1])
                     m = ConceptMatch(c.id, c.label_mn, c.type, neg, start, end)
                     # a positive mention wins over a negated one
@@ -173,22 +180,30 @@ class ConceptLexicon:
                 found[c.id] = best
         return list(found.values())
 
-    def _find(self, tokens: list[str], stems: list[str]):
+    def _find(self, tokens: list[str], stems: list[str], clause_bound: bool = False):
         for i, tok in enumerate(tokens):
             if not self._stem_match(tok, stems[0]):
                 continue
             pos, ok = i, True
             for stem in stems[1:]:
-                nxt = next(
-                    (j for j in range(pos + 1, min(len(tokens), pos + 1 + WINDOW)) if self._stem_match(tokens[j], stem)),
-                    None,
-                )
+                nxt = self._next_stem(tokens, pos, stem, clause_bound)
                 if nxt is None:
                     ok = False
                     break
                 pos = nxt
             if ok:
                 yield i, pos
+
+    def _next_stem(self, tokens: list[str], pos: int, stem: str, clause_bound: bool):
+        skipped_other = False
+        for j in range(pos + 1, min(len(tokens), pos + 1 + WINDOW)):
+            if self._stem_match(tokens[j], stem):
+                return j
+            is_body = tokens[j].startswith(BODY_PARTS)
+            if clause_bound and is_body and skipped_other:
+                return None                      # a new body part after other words = a new clause
+            skipped_other = skipped_other or not is_body
+        return None
 
     @staticmethod
     def _is_negated(tokens: list[str], end: int, last_stem: str) -> bool:

@@ -74,9 +74,24 @@ def transliterate_latin(word: str) -> str:
                 i += len(latin)
                 break
         else:
-            out.append(_LATIN_SINGLE.get(w[i], w[i]))
+            if w[i] == "v" and _v_means_ue(w, i):
+                out.append("ү")
+            else:
+                out.append(_LATIN_SINGLE.get(w[i], w[i]))
             i += 1
     return "".join(out)
+
+
+_LATIN_VOWELS = set("aeiouyqöü")
+
+
+def _v_means_ue(w: str, i: int) -> bool:
+    """Chat writers use "v" for BOTH в and ү: "davchdaad" (давчдаад) but "shvd" (шүд),
+    "hvvhed" (хүүхэд). Mongolian в always touches a vowel, so a "v" with no vowel
+    next to it is ү."""
+    prev = w[i - 1] if i > 0 else ""
+    nxt = w[i + 1] if i + 1 < len(w) else ""
+    return prev not in _LATIN_VOWELS and nxt not in _LATIN_VOWELS
 
 
 def script_of(text: str) -> str:

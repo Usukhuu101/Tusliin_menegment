@@ -33,6 +33,27 @@ _GREETING = re.compile(r"^\s*(саин|сн\s*уу|мэнд|hello|hi\b|hey\b|goo
 _THANKS = re.compile(r"баярлалаа|баярлаа|баярлала|thanks|thank you|thx")
 _QUESTION = re.compile(r"гэж\s*ю|юу\s*вэ|\bю\s*вэ|яаж|хэрхэн|шалтгаан|сэргиил|эмчилгээ|юунаас|аюултаи\s*юу|халдвартаи|what is|how (to|do)|why")
 _HEALTH = re.compile(r"эруул|овчин|эмч|эмнэлэг|шинж|овд|бие\s*муу|вакцин|дархлаа|ноир|стресс|сэтгэл|дасгал|жирэмс|хоол|health|doctor|sick")
+# A concrete health TOPIC (body part, organ, disease word, symptom verb) that the
+# lexicon does not know yet. Such a message is clear — it is not out of scope and
+# the user should hear "no reliable information yet", not "I did not understand".
+# Patterns are on FOLDED text (ө->о, ү->у, й->и, е->э, ь dropped).
+_HEALTH_TOPIC = re.compile(
+    r"\b(?:чих|арс|жин|яс)\b"                                            # short words: whole word only
+    r"|\bус\s+(?:их\s+)?уна"                                             # үс унах (hair loss); ус = water
+    r"|\b(?:шуд|чихн|чихэнд|чихээ|нуд|хамар|хузуу|уушг|элэг|боор|давсаг|умаи|бамбаи|булчирхаи|тархи|"
+    r"арсн|арсан|хумс|ясн|уэ\s+моч|шээ|отгон|баас|цус|сарин\s+тэмдэг|бэлгии|хавд|хатаа|хатаж|хорс|батга|улаи|"
+    r"шарх|урэвс|халдвар|вирус|нян|хорт|эмгэг|дутагдал|багадалт|ихсэлт|витамин|жинг|тураал|таргал|ковид|"
+    r"короно|астма|багтраа|дааг|хуруу|шагаи)"
+    r"|\b(?:tooth|teeth|ear|eye|eyes|kidney|skin|cancer|vitamin|asthma|covid|diabetes|anemia|leukemia|thyroid|"
+    r"disease|pain|infection)\b"
+)
+
+
+def mentions_health_topic(norm: NormalizedInput) -> bool:
+    """True when the message names a concrete health topic (even one the lexicon
+    does not know). Checked on folded Cyrillic AND on the raw text (English words
+    in an all-Latin message are transliterated in folded_text)."""
+    return bool(_HEALTH_TOPIC.search(norm.folded_text) or _HEALTH_TOPIC.search(norm.original.lower()))
 _NEGATIVE_ANSWER = re.compile(r"\b(угуи|баихгуи|бхгуи|алга|биш|no|nope|none)\b")
 _AFFIRMATIVE = re.compile(r"\b(тиим|тиимээ|тиимэ|бии)\b")          # folded "тийм", "бий"
 _EN_YES = re.compile(r"\b(yes|yeah|yep)\b")
@@ -105,7 +126,7 @@ class SymptomAgent(UsageTracker):
                 return "thanks"
             if session.pending_slots:
                 return "symptom_check"          # user is answering our questions
-            if _HEALTH.search(text) or _QUESTION.search(text):
+            if _HEALTH.search(text) or _QUESTION.search(text) or mentions_health_topic(norm):
                 return "unclear"
             return "out_of_scope"
         if "medication" in types:

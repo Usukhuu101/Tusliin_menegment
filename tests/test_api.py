@@ -46,7 +46,42 @@ def test_emergency(client):
 
 
 def test_unknown_topic_does_not_hallucinate(client):
-    assert chat(client, "Шүд өвдөөд байна")["message_type"] in ("FALLBACK", "CLARIFY")
+    assert chat(client, "Сүрьеэ гэж юу вэ")["message_type"] in ("FALLBACK", "CLARIFY")
+
+
+@pytest.mark.parametrize("msg", ["Үс их унаад байна", "Хумс хугараад цус гараад байна", "Витамин Д"])
+def test_clear_health_question_without_document_is_fallback_not_out_of_scope(client, msg):
+    # Named body part / health word -> honest "no reliable information yet",
+    # never "I only answer health questions" and never "I did not understand".
+    assert chat(client, msg)["message_type"] == "FALLBACK"
+
+
+@pytest.mark.parametrize("msg,doc", [
+    ("Чихрийн шижин гэж юу вэ", "MED_DIS_007"), ("Ковид гэж юу вэ", "MED_DIS_008"), ("Астма гэж юу вэ", "MED_DIS_009"),
+    ("Цус багадалт гэж юу вэ", "MED_DIS_010"), ("Жин хасах арга", "MED_NUT_001"), ("Батга гараад байна", "MED_SYM_022"),
+])
+def test_new_kb_topics_are_answered(client, msg, doc):
+    r = chat(client, msg)
+    assert r["message_type"] == "ANSWER" and r["sources"][0]["doc_id"] == doc
+
+
+def test_new_topic_after_answer_does_not_carry_old_symptom(client):
+    r1 = chat(client, "Толгой өвдөөд байна")
+    r2 = chat(client, "Өчигдрөөс, 5 оноо, үгүй", r1["session_id"])
+    assert r2["message_type"] == "ANSWER"
+    r3 = chat(client, "Шүд өвдөөд байна", r1["session_id"])
+    assert r3["message_type"] == "FOLLOWUP"
+    assert "шүд өвдөх" in r3["reply"] and "толгой өвдөх" not in r3["reply"]
+    r4 = chat(client, "2 хоног, 6 оноо, үгүй", r1["session_id"])
+    assert r4["message_type"] == "ANSWER" and r4["sources"][0]["doc_id"] == "MED_SYM_013"
+
+
+def test_old_topic_still_counts_for_triage(client):
+    # chest pain is answered first; breathlessness later is a NEW topic for retrieval,
+    # but triage must still combine both -> emergency.
+    r1 = chat(client, "Цээжээр өвдөж байна")
+    r2 = chat(client, "Одоо амьсгал давчдаад байна", r1["session_id"])
+    assert r2["message_type"] == "EMERGENCY"
 
 
 def test_feedback_and_delete(client):

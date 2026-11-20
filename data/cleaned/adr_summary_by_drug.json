@@ -6,18 +6,18 @@
     2026
   ],
   "top_reactions_overall": {
-    "rash": 410,
+    "rash": 407,
     "itching": 295,
-    "nausea": 293,
+    "nausea": 291,
     "vomiting": 159,
-    "dyspnea": 127,
-    "fever": 97,
+    "dyspnea": 126,
     "headache": 96,
     "palpitations": 83,
+    "fever": 81,
     "dizziness": 78,
-    "numbness": 60,
-    "frostbite": 56,
-    "abdominal_pain": 38
+    "numbness": 58,
+    "abdominal_pain": 38,
+    "diarrhea": 30
   },
   "drugs": {
     "цефотаксим": {
@@ -70,10 +70,10 @@
         "Цефтриаксон(Ceftriaxone)": 1
       },
       "top_reactions": {
-        "fever": 13,
+        "fever": 12,
         "rash": 11,
-        "nausea": 10,
         "itching": 9,
+        "nausea": 9,
         "vomiting": 4,
         "palpitations": 3
       },
@@ -151,7 +151,7 @@
         "nausea": 7,
         "vomiting": 2,
         "dyspnea": 1,
-        "frostbite": 1
+        "cold_sweat": 1
       },
       "severity": {
         "хүнд": 3,
@@ -183,7 +183,7 @@
         "itching": 16,
         "rash": 15,
         "nausea": 9,
-        "fever": 8,
+        "fever": 6,
         "abdominal_pain": 4,
         "vomiting": 4
       },
@@ -291,7 +291,7 @@
         "dyspnea": 6,
         "headache": 6,
         "nausea": 5,
-        "numbness": 4,
+        "numbness": 3,
         "seizure": 3
       },
       "severity": {
@@ -324,8 +324,8 @@
         "rash": 6,
         "itching": 6,
         "palpitations": 4,
-        "fever": 4,
-        "headache": 3
+        "headache": 3,
+        "vomiting": 3
       },
       "severity": {
         "хөнгөн": 5,
@@ -394,9 +394,9 @@
         "rash": 6,
         "itching": 5,
         "nausea": 3,
-        "fever": 2,
         "vomiting": 2,
-        "headache": 2
+        "headache": 2,
+        "numbness": 2
       },
       "severity": {
         "тодорхойгүй": 16,
@@ -532,12 +532,12 @@
         "Sodium Salicylate": 1
       },
       "top_reactions": {
-        "rash": 5,
         "nausea": 5,
+        "rash": 4,
         "dizziness": 3,
         "dyspnea": 3,
-        "frostbite": 2,
-        "vomiting": 2
+        "vomiting": 2,
+        "numbness": 2
       },
       "severity": {
         "хөнгөн": 8,
@@ -629,10 +629,10 @@
       "top_reactions": {
         "rash": 10,
         "itching": 6,
+        "insomnia": 4,
         "nausea": 4,
         "vomiting": 3,
-        "diarrhea": 2,
-        "headache": 2
+        "diarrhea": 2
       },
       "severity": {
         "тодорхойгүй": 9,
@@ -662,11 +662,11 @@
       },
       "top_reactions": {
         "nausea": 5,
-        "frostbite": 3,
         "fever": 2,
         "cold_sweat": 2,
         "rash": 2,
-        "headache": 1
+        "headache": 1,
+        "abdominal_pain": 1
       },
       "severity": {
         "хөнгөн": 5,
@@ -730,8 +730,8 @@
         "itching": 4,
         "nausea": 2,
         "runny_nose": 1,
-        "vomiting": 1,
-        "numbness": 1
+        "eye_problem": 1,
+        "vomiting": 1
       },
       "severity": {
         "тодорхойгүй": 9
@@ -902,7 +902,7 @@
         "dyspnea": 2,
         "vomiting": 2,
         "runny_nose": 1,
-        "palpitations": 1
+        "eye_problem": 1
       },
       "severity": {
         "хөнгөн": 2,
@@ -955,8 +955,8 @@
       },
       "top_reactions": {
         "itching": 4,
-        "rash": 3,
         "fever": 2,
+        "rash": 2,
         "throat_swelling": 1,
         "headache": 1,
         "palpitations": 1
@@ -999,10 +999,10 @@
       "top_reactions": {
         "rash": 3,
         "numbness": 2,
+        "urinary_symptoms": 2,
         "itching": 2,
         "vomiting": 1,
-        "dizziness": 1,
-        "fever": 1
+        "dizziness": 1
       },
       "severity": {
         "хүнд": 2,
@@ -1033,8 +1033,8 @@
         "palpitations": 2,
         "vomiting": 2,
         "headache": 2,
-        "frostbite": 1,
-        "abdominal_pain": 1
+        "abdominal_pain": 1,
+        "anaphylaxis": 1
       },
       "severity": {
         "хүнд": 1,
@@ -1058,11 +1058,11 @@
       },
       "top_reactions": {
         "rash": 4,
-        "frostbite": 2,
         "cough": 1,
         "fever": 1,
         "throat_swelling": 1,
-        "itching": 1
+        "itching": 1,
+        "frostbite": 1
       },
       "severity": {
         "хүнд": 5,
@@ -1196,7 +1196,7 @@
         "dizziness": 2,
         "numbness": 2,
         "palpitations": 2,
-        "frostbite": 2
+        "cold_sweat": 2
       },
       "severity": {
         "тодорхойгүй": 6
@@ -1216,7 +1216,8 @@
       "top_reactions": {
         "itching": 6,
         "rash": 5,
-        "dyspnea": 3
+        "dyspnea": 3,
+        "eye_problem": 1
       },
       "severity": {
         "хүнд": 1,
@@ -1243,7 +1244,7 @@
         "fever": 3,
         "sore_throat": 1,
         "throat_swelling": 1,
-        "headache": 1
+        "eye_problem": 1
       },
       "severity": {
         "хүнд": 3,
@@ -1299,12 +1300,12 @@
         "Паклитаксол": 1
       },
       "top_reactions": {
-        "fever": 2,
         "dyspnea": 2,
-        "frostbite": 2,
         "throat_swelling": 1,
+        "leg_swelling": 1,
         "rash": 1,
-        "itching": 1
+        "itching": 1,
+        "fever": 1
       },
       "severity": {
         "хөнгөн": 1,
@@ -1330,7 +1331,7 @@
       },
       "top_reactions": {
         "rash": 3,
-        "frostbite": 2,
+        "urinary_symptoms": 2,
         "nausea": 2,
         "itching": 2,
         "headache": 1,
@@ -1362,6 +1363,7 @@
         "itching": 2,
         "nausea": 2,
         "vomiting": 2,
+        "violence": 1,
         "headache": 1
       },
       "severity": {
@@ -1385,6 +1387,7 @@
       "top_reactions": {
         "itching": 4,
         "rash": 3,
+        "leg_swelling": 2,
         "dizziness": 1,
         "numbness": 1,
         "unconscious": 1
@@ -1438,10 +1441,10 @@
       "top_reactions": {
         "vomiting": 4,
         "nausea": 3,
-        "cough": 1,
         "rash": 1,
         "itching": 1,
-        "dyspnea": 1
+        "dyspnea": 1,
+        "fatigue": 1
       },
       "severity": {
         "тодорхойгүй": 3,
@@ -1516,7 +1519,6 @@
         "nausea": 3,
         "vomiting": 3,
         "fever": 2,
-        "frostbite": 1,
         "dizziness": 1
       },
       "severity": {
@@ -1607,8 +1609,8 @@
         "dyspnea": 2,
         "nausea": 1,
         "unconscious": 1,
-        "fever": 1,
-        "diarrhea": 1
+        "diarrhea": 1,
+        "palpitations": 1
       },
       "severity": {
         "тодорхойгүй": 4
@@ -1682,6 +1684,7 @@
         "rash": 1,
         "itching": 1,
         "nausea": 1,
+        "insomnia": 1,
         "dizziness": 1
       },
       "severity": {
@@ -1749,6 +1752,7 @@
       },
       "top_reactions": {
         "diarrhea": 1,
+        "insomnia": 1,
         "rash": 1
       },
       "severity": {
@@ -1801,7 +1805,6 @@
       "top_reactions": {
         "rash": 2,
         "fever": 1,
-        "frostbite": 1,
         "cold_sweat": 1,
         "itching": 1
       },
@@ -1830,7 +1833,7 @@
         "headache": 1,
         "nausea": 1,
         "vomiting": 1,
-        "frostbite": 1
+        "cold_sweat": 1
       },
       "severity": {
         "хөнгөн": 3
@@ -1850,7 +1853,6 @@
         "Пирацетам": 3
       },
       "top_reactions": {
-        "fever": 1,
         "rash": 1,
         "itching": 1,
         "nausea": 1
@@ -1879,7 +1881,8 @@
         "rash": 2,
         "abdominal_pain": 1,
         "diarrhea": 1,
-        "nausea": 1
+        "nausea": 1,
+        "eye_problem": 1
       },
       "severity": {
         "тодорхойгүй": 3
@@ -2080,8 +2083,8 @@
         "headache": 1,
         "rash": 1,
         "numbness": 1,
-        "dyspnea": 1,
-        "palpitations": 1
+        "leg_swelling": 1,
+        "dyspnea": 1
       },
       "severity": {
         "тодорхойгүй": 3
@@ -2165,7 +2168,8 @@
         "Дифенгидрамин": 3
       },
       "top_reactions": {
-        "frostbite": 3,
+        "frostbite": 2,
+        "insomnia": 1,
         "cold_sweat": 1
       },
       "severity": {
@@ -2206,7 +2210,6 @@
       "top_reactions": {
         "nausea": 2,
         "dizziness": 2,
-        "frostbite": 2,
         "cold_sweat": 2,
         "numbness": 1
       },
@@ -2331,12 +2334,12 @@
         "Фторурацил": 1
       },
       "top_reactions": {
-        "dyspnea": 2,
         "abdominal_pain": 1,
         "numbness": 1,
         "dizziness": 1,
         "palpitations": 1,
-        "rash": 1
+        "rash": 1,
+        "itching": 1
       },
       "severity": {
         "хүнд": 2,
@@ -2437,6 +2440,7 @@
       },
       "top_reactions": {
         "throat_swelling": 2,
+        "eye_problem": 2,
         "fever": 1,
         "rash": 1,
         "itching": 1
@@ -2525,6 +2529,7 @@
         "Цефадроксил": 1
       },
       "top_reactions": {
+        "eye_problem": 1,
         "rash": 1
       },
       "severity": {
@@ -2599,10 +2604,10 @@
         "Калийн холимог шингэн": 2
       },
       "top_reactions": {
-        "frostbite": 2,
         "nausea": 1,
         "vomiting": 1,
-        "cold_sweat": 1
+        "cold_sweat": 1,
+        "frostbite": 1
       },
       "severity": {
         "тодорхойгүй": 2
@@ -2789,7 +2794,9 @@
         "флуфеназин деканоат": 1,
         "Флуфеназин": 1
       },
-      "top_reactions": {},
+      "top_reactions": {
+        "insomnia": 1
+      },
       "severity": {
         "тодорхойгүй": 1,
         "хүнд": 1
@@ -2853,9 +2860,9 @@
         "itching": 2,
         "abdominal_pain": 1,
         "rash": 1,
-        "chest_pain": 1,
         "dyspnea": 1,
-        "palpitations": 1
+        "palpitations": 1,
+        "numbness": 1
       },
       "severity": {
         "тодорхойгүй": 2
@@ -2873,11 +2880,11 @@
       },
       "top_reactions": {
         "rash": 1,
+        "eye_problem": 1,
         "abdominal_pain": 1,
         "diarrhea": 1,
         "nausea": 1,
-        "palpitations": 1,
-        "throat_swelling": 1
+        "palpitations": 1
       },
       "severity": {
         "тодорхойгүй": 2
@@ -3087,10 +3094,10 @@
       "top_reactions": {
         "dyspnea": 2,
         "abdominal_pain": 1,
-        "frostbite": 1,
         "cold_sweat": 1,
         "rash": 1,
-        "throat_swelling": 1
+        "throat_swelling": 1,
+        "eye_problem": 1
       },
       "severity": {
         "хөнгөн": 1,
@@ -3152,7 +3159,8 @@
       "top_reactions": {
         "rash": 1,
         "itching": 1,
-        "seizure": 1
+        "seizure": 1,
+        "leg_swelling": 1
       },
       "severity": {
         "хүнд": 1
@@ -3231,8 +3239,7 @@
         "Мелбек": 1
       },
       "top_reactions": {
-        "rash": 1,
-        "numbness": 1
+        "rash": 1
       },
       "severity": {
         "хөнгөн": 1
@@ -3251,7 +3258,8 @@
         "Аурофорт": 1
       },
       "top_reactions": {
-        "itching": 1
+        "itching": 1,
+        "eye_problem": 1
       },
       "severity": {
         "хөнгөн": 1
@@ -3292,7 +3300,6 @@
         "Лориста Н": 1
       },
       "top_reactions": {
-        "fever": 1,
         "vomiting": 1,
         "itching": 1,
         "dizziness": 1
@@ -3356,7 +3363,8 @@
       },
       "top_reactions": {
         "rash": 1,
-        "throat_swelling": 1
+        "throat_swelling": 1,
+        "eye_problem": 1
       },
       "severity": {
         "хүнд": 1
@@ -3416,7 +3424,6 @@
       "top_reactions": {
         "diarrhea": 1,
         "nausea": 1,
-        "frostbite": 1,
         "cold_sweat": 1
       },
       "severity": {
@@ -3634,7 +3641,9 @@
       "names": {
         "Метизопринол": 1
       },
-      "top_reactions": {},
+      "top_reactions": {
+        "constipation": 1
+      },
       "severity": {
         "тодорхойгүй": 1
       },
@@ -3803,7 +3812,6 @@
       },
       "top_reactions": {
         "headache": 1,
-        "fever": 1,
         "nausea": 1
       },
       "severity": {
@@ -3823,7 +3831,9 @@
       "top_reactions": {
         "headache": 1,
         "dyspnea": 1,
-        "palpitations": 1
+        "palpitations": 1,
+        "insomnia": 1,
+        "leg_swelling": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -3917,7 +3927,8 @@
       "top_reactions": {
         "headache": 1,
         "vomiting": 1,
-        "palpitations": 1
+        "palpitations": 1,
+        "leg_swelling": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -4128,8 +4139,7 @@
         "Цетризин": 1
       },
       "top_reactions": {
-        "abdominal_pain": 1,
-        "frostbite": 1
+        "abdominal_pain": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -4164,7 +4174,9 @@
       },
       "top_reactions": {
         "nausea": 1,
-        "vomiting": 1
+        "vomiting": 1,
+        "eye_problem": 1,
+        "leg_swelling": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -4181,8 +4193,7 @@
         "Имупрет": 1
       },
       "top_reactions": {
-        "rash": 1,
-        "frostbite": 1
+        "rash": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -4325,8 +4336,7 @@
         "Pantoprazole": 1
       },
       "top_reactions": {
-        "fever": 1,
-        "nausea": 1
+        "fever": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -4810,7 +4820,7 @@
         "nausea": 1,
         "vomiting": 1,
         "rash": 1,
-        "frostbite": 1
+        "cold_sweat": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -4842,7 +4852,8 @@
         "Sisplatin 50mg/50ml,": 1
       },
       "top_reactions": {
-        "nausea": 1
+        "nausea": 1,
+        "leg_swelling": 1
       },
       "severity": {
         "тодорхойгүй": 1
@@ -5385,7 +5396,6 @@
         "Лабор": 1
       },
       "top_reactions": {
-        "frostbite": 1,
         "unconscious": 1,
         "anaphylaxis": 1
       },
@@ -5645,9 +5655,9 @@
         "headache": 1,
         "abdominal_pain": 1,
         "nausea": 1,
-        "rash": 1,
         "dyspnea": 1,
-        "palpitations": 1
+        "palpitations": 1,
+        "numbness": 1
       },
       "severity": {
         "хүнд": 1
@@ -5682,8 +5692,7 @@
         "Тинидазол 0.4г": 1
       },
       "top_reactions": {
-        "nausea": 1,
-        "frostbite": 1
+        "nausea": 1
       },
       "severity": {
         "хүнд": 1
@@ -5719,7 +5728,6 @@
       "top_reactions": {
         "nausea": 1,
         "rash": 1,
-        "frostbite": 1,
         "cold_sweat": 1
       },
       "severity": {
@@ -5737,7 +5745,6 @@
         "Экватор 10/20мг": 1
       },
       "top_reactions": {
-        "diarrhea": 1,
         "vomiting": 1
       },
       "severity": {
@@ -6108,7 +6115,8 @@
         "Атеналол": 1
       },
       "top_reactions": {
-        "fatigue": 1
+        "fatigue": 1,
+        "insomnia": 1
       },
       "severity": {
         "хөнгөн": 1
@@ -6378,7 +6386,8 @@
       },
       "top_reactions": {
         "nausea": 1,
-        "dyspnea": 1
+        "dyspnea": 1,
+        "joint_pain": 1
       },
       "severity": {
         "хөнгөн": 1
@@ -6418,8 +6427,7 @@
       },
       "top_reactions": {
         "nausea": 1,
-        "palpitations": 1,
-        "frostbite": 1
+        "palpitations": 1
       },
       "severity": {
         "хөнгөн": 1

@@ -5,7 +5,7 @@ pydantic>=2.6
 pyyaml>=6.0
 numpy>=1.26
 
-# --- LLM (optional: only used when ANTHROPIC_API_KEY is set) ---
+# --- LLM (optional: only used when ANTHROPIC_API_KEY is set; Gemini / OpenAI-compatible need no extra package) ---
 anthropic>=2.0
 
 # --- data scripts (scripts/build_adr_summaries.py) ---
